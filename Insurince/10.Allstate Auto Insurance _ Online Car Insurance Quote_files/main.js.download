@@ -1,0 +1,25 @@
+
+
+
+
+function completeAndRedirect(tfn)
+{
+
+var zipcode = document.getElementById('zipcode').value;
+var campaignID = getUrlVars()['CAMPAIGN'];
+if(campaignID == undefined){
+    campaignID="";
+  }
+window.open("https://purchase.allstate.com/onlineshopping/welcome?Product=Au&ZipCode=" + zipcode + "&CAMPAIGN="+campaignID+"&intcid=ILC-LSP-Affiliate-AutoPlanners:GetAQuote","_self");
+} 
+
+function getUrlVars(){
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++) {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = unescape(hash[1]);
+    }
+    return vars;
+}

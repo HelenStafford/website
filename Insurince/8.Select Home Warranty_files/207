@@ -1,0 +1,1 @@
+function load_apxlv_pixels() { if(document.readyState == 'interactive'){setTimeout(load_apxlv_pixels, 100); return;}; if(! document.getElementsByTagName('body')[0]){var b = document.createElement('body'); document.getElementsByTagName('html')[0].appendChild(b);}; document_body = document.getElementsByTagName('body')[0]; ;}; load_apxlv_pixels();

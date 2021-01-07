@@ -1,0 +1,401 @@
+/* eslint-disable space-before-blocks */
+/*
+*****************************************************
+Cake or Href
+    Cake:
+        Define: if affiliate is using cake. On the affiliate object, set cake true, and specifiy cake on "BpageclickEventType"
+        Populate: Populate the affiliates cake object
+    Href:
+        Define:if affiliate is using cake. On the affiliate object, set cake false, and specifiy href "BpageclickEventType".
+        Populate: Bpage.hrefLink property.
+*****************************************************
+Custom HTML:
+    If you want to do custom HTML instead of based template, use the customHTML for your affiliate in affiliates.JSON
+*****************************************************
+Redirect Anchor:
+    Custom Anchor for tracking and redirect should have id set to:
+        Desktop: "offerLnk_Insert"
+            ex:<a id="offerLnk_Insert">Click Here for Experian Boost</a>\
+        Mobile:"affLnk_Insert"
+            ex:<a id="affLnk_Insert">Click Here for Experian Boost</a>\
+*/
+function dynamicAffiliate(affiliateName) {
+    this.affiliates = {};
+    this.deviceTypes = ['mobile', 'desktop'];
+    this.pageTypes = ['I', 'A', 'B'];
+    this.populateAffiliates = function() {
+        if (typeof affiliateJSON === 'object') {
+            dynamicAffiliate.affiliates = affiliateJSON;
+        }
+    };
+    this.addCSS = function(content, target) {
+        /* inject css supplied in affiliate JSON */
+        var customCSS = ['<style type="text/css">' + target + '{' + content + '}</style>'].join('');
+        $('head').append(customCSS);
+    };
+    this.getCookie = function(cookieName) {
+        var v = document.cookie.match('(^|;) ?' + cookieName + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    };
+    this.getAffiliateByQString = function(){
+        var name = 'affiliate'
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        try{
+            results =decodeURIComponent(results[1].replace(/\+/g, ' '))
+        }catch(e){
+            results=''
+        }
+        return results;
+    };
+    this.getPage = function() {
+        /* function to get page location */
+        var pageName = '';
+        if  (document.location.pathname.indexOf('index') > -1||document.location.pathname.indexOf('/lp/')>-1 ) {
+            pageName = 'I';
+        } else {
+            pageName = $('html').attr('class').split(' ')[0];
+            pageName = pageName.replace('form', '');
+        }
+        return pageName.toUpperCase();
+    };
+    this.getDeviceType = function() {
+        var device = '';
+        if (document.location.pathname.indexOf('\/m\/') > -1) {
+            device = 'mobile';
+        } else {
+            device = 'desktop';
+        }
+        return device;
+    };
+    this.getAffiliateName = function() {
+        var reducePath = new RegExp(/\/([a-zA-Z0-9]*)_/);
+        var lpPath = document.location.pathname.split(reducePath)[1];
+        return lpPath.substring(lpPath.indexOf('_') + 1).toUpperCase();
+    };
+    this.getAffiliateContent = function(AffliateName) {
+        /* search Affiliates for JSON content */
+        var content = dynamicAffiliate.affiliates.affiliate.find(function(data) {
+            /* check if string */
+            if (typeof data.name === 'string') {
+                return data.name.toUpperCase() === AffliateName;
+            }
+            return false;
+        });
+        return content;
+    };
+    this.deleteCookie = function(name) {
+        /* delete cookie with cake */
+        this.setCookie(name, '', -1);
+    };
+    this.setCookie = function(name, value, days) {
+        var d = new Date();
+        d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
+        document.cookie = name + '=' + value + ';path=/;expires=' + d.toGMTString();
+    };
+    this.setAffiliateCookie = function(affiliate) {
+        /* create cookie with affiliate */
+        var days = 30;
+        var name = 'affiliate';
+        this.setCookie(name, affiliate, days);
+    };
+    this.setCakeCookie = function(content, deviceType) {
+        /* Set cookie with cake values */
+        var cakeString = '';
+        if (deviceType == 'desktop') {
+            cakeString = JSON.stringify(content.Desktop.cake.offers);
+        } else if (deviceType == 'mobile') {
+            cakeString = JSON.stringify(content.Mobile.cake);
+        }
+        /* create cookie with cake */
+        var days = 30;
+        let name = 'cake';
+        this.setCookie(name, cakeString, days);
+    };
+    this.serveContent = function(content, deviceType, page) {
+        if (content.cake) {
+            this.setCakeCookie(content, deviceType);
+        } else {
+            this.deleteCookie('cake');
+        }
+        if (deviceType === this.deviceTypes[1]) {
+            if (page === this.pageTypes[0]) {
+                this.createPageContent(content.Desktop.IPage, deviceType, page);
+            } else if (page === this.pageTypes[2]) {
+                this.createPageContent(content.Desktop.BPage, deviceType, page);
+            }
+        } else if (deviceType === this.deviceTypes[0]) {
+            if (page === this.pageTypes[0]) {
+                this.createPageContent(content.Mobile.IPage, deviceType, page);
+            } else if (page === this.pageTypes[2]) {
+                this.createPageContent(content.Mobile.BPage, deviceType, page);
+            }
+        }
+    };
+    this.testableIntergration = function() {
+        var testableAffiliateRespone = globalTestableData.Pages.find(function(data){'Entry_Page' === data.PageTypeString}).Data;
+        var testableRespone = JSON.parse(testableAffiliateRespone).spl.entryPage.Affiliate;
+        /* Check testable Affiliate flag
+         check Testable event
+        testable action */
+        if (testableRespone.testableAction.toUpperCase() == 'CHANGE') {
+            /* Changing affiliate content */
+            this.testableAffiliateChange(testableRespone.data);
+        } else if (testableRespone.testableAction.toUpperCase() == 'NEW') {
+            /* Append new Affiliate JSON */
+            this.testableAffiliateNew(testableRespone.data);
+        }
+        /* Return affiliate Name */
+        return testableRespone.data.name;
+    };
+    this.testableAffiliateChange = function(data) {
+        var AffList = dynamicAffiliate.affiliates.affiliate;
+        for (var i = 0; i < AffList.length; i++) {
+            if (AffList[i].name === data.name) {
+                $.extend(true, AffList[i], data);
+                dynamicAffiliate.affiliates.affiliate[i] = AffList[i];
+            }
+        }
+    };
+    this.testableAffiliateNew = function(data) {
+        dynamicAffiliate.affiliates.affiliate.push(data);
+    };
+    this.createPageContent = function(content, deviceType, pageType) {
+        var htmlString = '';
+        if (pageType === this.pageTypes[0] && deviceType === this.deviceTypes[0]) {
+            htmlString = [
+                '<h3>' + content.header + '</h3>',
+                '<ul class="od-list">',
+                '<li>' + content.line1 + '</li>',
+                '<li>' + content.line2 + '</li>',
+                '<li>' + content.line3 + '</li>',
+                '<li>' + content.line4 + '</li>',
+                '<li>' + content.line5 + '</li></ul>'
+            ].join('');
+            $(content.target).html(htmlString);
+        };
+        if (pageType === this.pageTypes[0] && deviceType === this.deviceTypes[1]) {
+            htmlString = [
+                '<h3>' + content.header + '</h3>',
+                '<p>' + content.line1 + '</p>',
+                '<p>' + content.line2 + '</p>',
+                '<p>' + content.line3 + '</p>',
+                '<p>' + content.line4 + '</p>',
+                '<p>' + content.line5 + '</p>'
+            ].join('');
+            $(content.target).html(htmlString);
+        };
+        if (pageType === this.pageTypes[2] && deviceType === this.deviceTypes[0]) {
+            htmlString = ['<h4>' + content.header + '</h4>',
+                '<p>' + content.line1 + '</p>',
+                '<a id="affLnk_Insert">' + content.anchor + '</a>'   
+            ]
+            if(content.disclaimer!=undefined){
+                htmlString.push('<p id="disclaimer">' + content.disclaimer + '</p>')
+            }
+            htmlString.join('')
+            $(content.target).html(htmlString);
+        };
+        if (pageType === this.pageTypes[2] && deviceType === this.deviceTypes[1]) {
+            
+            htmlString = [
+                '<h4>' + content.header + '</h4>',
+                '<p>' + content.line1 + '</p>',
+                '<a id="offerLnk_Insert">' + content.anchor + '</a>'
+            ]
+            if(content.disclaimer!=undefined){
+                htmlString.push('<p id="disclaimer">' + content.disclaimer + '</p>')
+            }
+            htmlString.join('')
+            $(content.target).html(htmlString);
+        };
+        if (pageType === this.pageTypes[2] && deviceType === this.deviceTypes[1]) {
+            if (content.clickEventType === 'href') {
+                $('#offerLnk_Insert').on('click', function() {
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    window.open(content.hrefLink, '_blank');
+                });
+            } else if (content.clickEventType === 'ssb-href') {
+                $('#offerLnk_Insert').on('click', function() {
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    window.open(content.hrefLink + location.search + "&bPage=" + location.pathname, '_blank');
+                });
+            } else if (content.clickEventType.toUpperCase() === 'CAKE') {
+                $('#offerLnk_Insert').on('click', function() {
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    setProductAndRedirect(1);
+                });
+            } else if (content.clickEventType.toUpperCase() === 'CAKE_HARD_CODED') {
+                $('#offerLnk_Insert').on('click', function() {
+                    //Hard coded Cake link that needs public ID dynamically added.
+                    var publicId 
+                    try {
+                        
+                        var publicIDCookie = document.cookie.match("(^|;)\\s*" + "PublicId" + "\\s*=\\s*([^;]+)");
+                        var publicIdData = JSON.parse(publicIDCookie  ? publicIDCookie.pop() : "");
+                        publicId = publicIdData.PublicId
+                      } catch (error) {
+                        publicId = -1
+                      }
+                      logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                      window.open(content.hrefLink+publicId, '_blank');
+                });
+            }
+        }
+        if (pageType === this.pageTypes[2] && deviceType === this.deviceTypes[0]) {
+            if (content.clickEventType === 'href') {
+                $('#affLnk_Insert').on('click', function() {
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    window.open(content.hrefLink, '_blank');
+                });
+            }else if (content.clickEventType === 'ssb-href') {
+                $('#affLnk_Insert').on('click', function() {
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    window.open(content.hrefLink + location.search + "&bPage=" + location.pathname, '_blank');
+                });
+            } else if (content.clickEventType.toUpperCase() === 'CAKE') {
+                $('#affLnk_Insert').on('click', function() {
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    setProductAndRedirect(1);
+                });
+            } else if (content.clickEventType.toUpperCase() === 'CAKE_HARD_CODED') {
+                $('#affLnk_Insert').on('click', function() {
+                    //Hard coded Cake link that needs public ID dynamically added.
+                    var publicId 
+                    try {
+                        
+                        var publicIDCookie = document.cookie.match("(^|;)\\s*" + "PublicId" + "\\s*=\\s*([^;]+)");
+                        var publicIdData = JSON.parse(publicIDCookie  ? publicIDCookie.pop() : "");
+                        publicId = publicIdData.PublicId
+                      } catch (error) {
+                        publicId = -1
+                      }
+                    logAction(content.logActionVariable).addActionVariable(content.logAction, content.logActionEvent).log();
+                    window.open(content.hrefLink+publicId, '_blank');
+                });
+            }
+        }
+        if (content.CSS && content.CSS != '') {
+            this.addCSS(content.CSS, content.target);
+        }
+    };
+    try {
+        /* Get Affiliates */
+        this.populateAffiliates();
+        /* Get page location */
+        var page = this.getPage();
+        /* Get affiliateName if not provided. 
+                AffiliateName Hierarchy (Provided name>Testable>Pathname>Cookie) */
+        /* Check for Testable  */
+        if ((typeof globalTestableData === 'object' && affiliateName === undefined) && page !== this.pageTypes[2]) {
+            /* Run Testable and Returns Name provided by Testable */
+            affiliateName = this.testableIntergration();
+        }
+        if (!affiliateName) {
+            affiliateName = this.getAffiliateByQString()
+        }
+        if (!affiliateName) {
+            if (page === this.pageTypes[0] || page === this.pageTypes[1]) {
+                /* Check Path */
+                affiliateName = this.getAffiliateName();
+            }
+            if (!affiliateName) {
+                /* Check Cookie */
+                if (this.getCookie('affiliate') != null) {
+                    affiliateName = this.getCookie('affiliate');
+                }
+            }
+        }
+        if (affiliateName) {
+            /* Mobile or desktop */
+            var deviceType = this.getDeviceType();
+            /* Get Content */
+            var content = this.getAffiliateContent(affiliateName.toUpperCase());
+            if (content) {
+                /* CookieWork */
+                if (document.cookie.indexOf('affiliate=') === -1 || this.getCookie('affiliate').toUpperCase() !== affiliateName) {
+                    this.setAffiliateCookie(affiliateName);
+                }
+                if (page === this.pageTypes[0] || page === this.pageTypes[1] || page === this.pageTypes[2]) {
+                    /* Index or B Page */
+                    this.serveContent(content, deviceType, page);
+                }
+            } else if (page === this.pageTypes[0] || page === this.pageTypes[2]) {
+                /* Delete Cake and Affiliate Cookie */
+                this.deleteCookie('affiliate');
+                this.deleteCookie('cake');
+            }
+        }
+    } catch (e) {
+        console.log('Offers have failed, Error: '+ e);
+    }
+}
+/*
+ * Array.prototype.find() polyfill
+ * Adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+ * @author Chris Ferdinandi
+ * @license MIT
+ */
+if (!Array.prototype.find) {
+    Array.prototype.find = function(callback) {
+        // 1. Let O be ? ToObject(this value).
+        if (this == null) {
+            throw new TypeError('"this" is null or not defined');
+        }
+
+        var o = Object(this);
+
+        // 2. Let len be ? ToLength(? Get(O, "length")).
+        var len = o.length >>> 0;
+
+        // 3. If IsCallable(callback) is false, throw a TypeError exception.
+        if (typeof callback !== 'function') {
+            throw new TypeError('callback must be a function');
+        }
+
+        // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+        var thisArg = arguments[1];
+
+        // 5. Let k be 0.
+        var k = 0;
+
+        // 6. Repeat, while k < len
+        while (k < len) {
+            // a. Let Pk be ! ToString(k).
+            // b. Let kValue be ? Get(O, Pk).
+            // c. Let testResult be ToBoolean(? Call(callback, T, « kValue, k, O »)).
+            // d. If testResult is true, return kValue.
+            var kValue = o[k];
+            if (callback.call(thisArg, kValue, k, o)) {
+                return kValue;
+            }
+            // e. Increase k by 1.
+            k++;
+        }
+
+        // 7. Return undefined.
+        return undefined;
+    };
+}
+if (typeof globalTestableData != "undefined") {
+    if (typeof globalTestableData == "object" && $.isArray(globalTestableData.Pages)) {
+        if (typeof globalTestableData.Pages.find(function(data){'Entry_Page' === data.PageTypeString}) == "object") {
+            document.addEventListener("DOMContentLoaded", function(event) {
+                //Only Use function when Entry_Page is present in Testable.
+
+                dynamicAffiliate();
+
+            });
+        }
+    }
+}
+if (document.cookie.indexOf(' affiliate=') >= 0 && (document.location.href.indexOf('cs_4p_b') >= 0 || document.location.href.indexOf('cs_5p_b') > 0)||document.location.search.indexOf("affiliate=")>= 0) {
+    document.addEventListener("DOMContentLoaded", function(event) {
+        //Only fire on B page
+        dynamicAffiliate();
+    });
+    window.addEventListener('load', function() {
+        logAction("Affiliate_Name").addActionVariable("Affiliate", getCookie('affiliate')).log();
+    })
+}

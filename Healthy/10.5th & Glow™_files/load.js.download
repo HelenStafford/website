@@ -1,0 +1,43 @@
+(function(verifier = false){
+	var getCookie = function(cname) {
+		var name = cname + "=";
+		var decodedCookie = decodeURIComponent(document.cookie);
+		var ca = decodedCookie.split(';');
+		for(var i = 0; i <ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) == ' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf(name) == 0) {
+				return c.substring(name.length, c.length);
+			}
+		}
+		return "";
+	}
+	
+	var d = document;
+	var params = "";
+	
+	if(verifier !== false){
+		params += "verifier="+verifier+"&";
+	}
+	
+		params += (d.cookie.indexOf("tgopt_2607=")!=-1)?"tgopt_2607="+getCookie("tgopt_2607")+"&":"";
+		d.cookie = "tgopt_2607=1;expires="+new Date(new Date().getTime() + 604800000).toGMTString()+";domain=unbuttonedbeauty.com;path=/;";
+	
+	if(d.cookie.indexOf("tgopt_id=") == -1)
+		d.cookie = "tgopt_id=sCpf30LFKeLE0Ooog6DX2y2AifEiSFy9;expires="+new Date(new Date().getTime() + 604800000).toGMTString()+";domain=unbuttonedbeauty.com;path=/;";
+	
+	params += (d.cookie.indexOf("tgopt_id=")!=-1)?"tgopt_id="+getCookie("tgopt_id")+"&":"";
+	params += "r="+Math.random();
+	
+	//var uri = encodeURIComponent(window.location.hostname+window.location.pathname+window.location.search);
+	var uri = encodeURIComponent("unbuttonedbeauty.com/go/index3.php?trans=102ad2678cb631f2bf6c8655479e9b&aff_id=1994&aff_sub1=&aff_sub2=&aff_sub3=&aff_sub4=&aff_sub5=&utm_source=hasoffers&utm_campaign=affiliate-1994&aff_id=1994");
+	
+	params += "&u="+uri;
+	var imgUrl = "//main.tgoptimize.com/my.gif?"+params;
+	var d = document.createElement("img");
+    d.width = 1;
+    d.height = 1;
+    d.src = imgUrl;
+})();

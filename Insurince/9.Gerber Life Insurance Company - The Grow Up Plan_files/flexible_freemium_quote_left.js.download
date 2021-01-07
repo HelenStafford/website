@@ -1,0 +1,5 @@
+$("#mobile_ribbon").click(function() {
+    $('html, body').animate({
+        scrollTop: $("#page_left_content").offset().top
+    }, 800);
+});

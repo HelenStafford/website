@@ -1,0 +1,237 @@
+// jQuery wrapper
+(function($) {
+// Document ready
+$(document).ready(function(){
+
+/**
+*** Setup
+**/
+
+// Javascript is enabled
+$('html.ie').removeClass('no-js').addClass('js');
+$('#nojs-notice').remove();
+
+// IE classes 
+if (/*@cc_on!@*/false) {
+    document.documentElement.className+=' ie' + document.documentMode;
+}
+
+
+    $("#carousel").owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        responsive:{
+            0:{
+                items:1,
+                nav:false
+            },
+            400:{
+                items:2,
+                nav:false
+            },
+            600:{
+                items:3,
+                nav:false
+            },
+            1000:{
+                items:4,
+                nav:false,
+                loop:false
+            }
+        }
+    });
+
+
+    $("a.mobile-nav").on("click" , function(e){
+        e.preventDefault();
+        $(this).closest("nav").find("ul").slideToggle();
+    });
+
+/**
+*** Site
+**/
+
+
+
+// end document ready
+});
+
+// end jQuery wrapper
+})(jQuery);
+
+
+jQuery(function($){
+    $('#open-mobile-menu').click(function () {
+        $('.mobile-side-menu').css("display", "block");
+        $('#intercom-container').css("display", "none");
+    });
+    $('#mobile-side-menu').click(function () {
+        $('.mobile-side-menu').css("display", "none");
+        $('#intercom-container').css("display", "block");
+    });
+    $('#close-mobile-menu img').click(function () {
+        $('.mobile-side-menu').css("display", "none");
+        $('#intercom-container').css("display", "block");
+    });
+    $('div.mobile-side-menu').click(function(e) {
+        if(e.target != this) return;
+        $('.mobile-side-menu').css("display", "none");
+        $('#intercom-container').css("display", "block");
+    });
+});
+
+
+
+jQuery(function($){
+    $('.cart-close').on('click', function(e) {
+        $('.minicart').hide();
+    });
+
+});
+
+// SET COOKIE OR LOCAL STORAGE /special-offer-oil DESKTOP
+jQuery('#wpforms-submit-19696').on('click', function(evt) {
+    // Collect
+    var first_name_soo = jQuery("#wpforms-19696-field_2").val();
+    var last_name_soo = jQuery("#wpforms-19696-field_2-last").val(); 
+    var email_soo = jQuery("#wpforms-19696-field_1").val();
+    // Create
+    localStorage.first_name_soo = first_name_soo;
+    localStorage.last_name_soo = last_name_soo;
+    localStorage.email_soo = email_soo;
+    localStorage.page_soo = true;
+    localStorage.page_loo = false;
+    // Can use this when https is enabled
+    /* document.cookie = "first_name_soo=" + first_name_soo;
+    document.cookie = "last_name_soo=" + last_name_soo;
+    document.cookie = "email_soo=" + email_soo; 
+    document.cookie = "page_soo=" + true;
+    document.cookie = "page_loo=" + false; */
+});
+
+// SET COOKIE OR LOCAL STORAGE /limited-offer-oil DESKTOP
+jQuery('#wpforms-submit-19701').on('click', function(evt) {
+    // Collect
+    var first_name_loo = jQuery("#wpforms-19701-field_1").val();
+    var last_name_loo = jQuery("#wpforms-19701-field_1-last").val(); 
+    var email_loo = jQuery("#wpforms-19701-field_2").val();
+    // Create
+    localStorage.first_name_loo = first_name_loo;
+    localStorage.last_name_loo = last_name_loo;
+    localStorage.email_loo = email_loo;
+    localStorage.page_loo = true;
+    localStorage.page_soo = false;
+    // Can use this when https is enabled
+    /* document.cookie = "first_name_loo=" + first_name_loo;
+    document.cookie = "last_name_loo=" + last_name_loo;
+    document.cookie = "email_loo=" + email_loo; 
+    document.cookie = "page_loo=" + true;
+    document.cookie = "page_soo=" + false; */
+});
+
+// SET COOKIE OR LOCAL STORAGE /special-offer-oil MOBILE
+jQuery('#wpforms-submit-19763').on('click', function(evt) {
+    // Collect
+    var first_name_soo = jQuery("#wpforms-19763-field_2").val();
+    var last_name_soo = jQuery("#wpforms-19763-field_2-last").val(); 
+    var email_soo = jQuery("#wpforms-19763-field_1").val();
+    // Create
+    localStorage.first_name_soo = first_name_soo;
+    localStorage.last_name_soo = last_name_soo;
+    localStorage.email_soo = email_soo;
+    localStorage.page_soo = true;
+    localStorage.page_loo = false;
+    // Can use this when https is enabled
+    /* document.cookie = "first_name_soo=" + first_name_soo;
+    document.cookie = "last_name_soo=" + last_name_soo;
+    document.cookie = "email_soo=" + email_soo; 
+    document.cookie = "page_soo=" + true;
+    document.cookie = "page_loo=" + false; */
+});
+
+// SET COOKIE OR LOCAL STORAGE /limited-offer-oil MOBILE
+jQuery('#wpforms-submit-19762').on('click', function(evt) {
+    // Collect
+    var first_name_loo = jQuery("#wpforms-19762-field_1").val();
+    var last_name_loo = jQuery("#wpforms-19762-field_1-last").val(); 
+    var email_loo = jQuery("#wpforms-19762-field_2").val();
+    // Create
+    localStorage.first_name_loo = first_name_loo;
+    localStorage.last_name_loo = last_name_loo;
+    localStorage.email_loo = email_loo;
+    localStorage.page_loo = true;
+    localStorage.page_soo = false;
+    // Can use this when https is enabled
+    /* document.cookie = "first_name_loo=" + first_name_loo;
+    document.cookie = "last_name_loo=" + last_name_loo;
+    document.cookie = "email_loo=" + email_loo; 
+    document.cookie = "page_loo=" + true;
+    document.cookie = "page_soo=" + false; */
+});
+
+// FILL DATA ON CHECKOUT PAGE ALL VARIATIONS
+if(jQuery('body.page-id-43').length){
+  if(localStorage.page_soo == "true") { // special offer oil data autofill
+      jQuery("#billing_first_name").val(localStorage.first_name_soo);
+      jQuery("#billing_last_name").val(localStorage.last_name_soo); 
+      jQuery("#billing_email").val(localStorage.email_soo);
+  } else if(localStorage.page_loo == "true") { // limited offer oil data autofill
+      jQuery("#billing_first_name").val(localStorage.first_name_loo);
+      jQuery("#billing_last_name").val(localStorage.last_name_loo); 
+      jQuery("#billing_email").val(localStorage.email_loo);
+  } else { // do nothing or place for more pages to add logic
+      
+  }
+}
+
+// Klaviyo user started checkout
+function fireCheckoutEvent(klaviyoData) {
+    var emailKlaviyo = jQuery("#billing_email").val();
+    var nameKlaviyo = jQuery("#billing_first_name").val();
+    var lastnameKlaviyo = jQuery("#billing_email").val();
+            if(emailKlaviyo != '' && nameKlaviyo !='' && lastnameKlaviyo !=''){
+                console.log(klaviyoData);
+                console.log(emailKlaviyo);
+                _learnq.push(["identify", {"\$email" : emailKlaviyo}]);   
+                _learnq.push(["track", ("\$started_checkout"), klaviyoData ]);
+                console.log('Event successful!');
+          } else {
+              console.log('Event failed, some field is empty!');
+          }
+    }
+
+// When page loads
+jQuery(window).on("load",function(){
+    var klaviyoData = {
+        $service: "woocommerce",
+        CurrencySymbol: "&#36;", 
+        Currency: "USD", 
+        $value: gtm4wp_checkout_products[0].price * gtm4wp_checkout_products[0].quantity,
+        Categories: {
+            0: "Herbal Drops"
+        },
+        ItemNames: {
+            0: gtm4wp_checkout_products[0].name
+        },
+        $extra: {
+            GrandTotal: gtm4wp_checkout_products[0].price * gtm4wp_checkout_products[0].quantity,
+            SubTotal: gtm4wp_checkout_products[0].price * gtm4wp_checkout_products[0].quantity,
+            Items: {
+                0: {
+                    Name: gtm4wp_checkout_products[0].name,
+                    Quantity: gtm4wp_checkout_products[0].quantity,
+                    ProductID: gtm4wp_checkout_products[0].id,
+                    LineTotal: gtm4wp_checkout_products[0].price * gtm4wp_checkout_products[0].quantity,
+                    Categories: {
+                            0: "Herbal Drops"
+                        },
+                    ProductID: gtm4wp_checkout_products[0].sku,
+                    SubTotal: gtm4wp_checkout_products[0].price * gtm4wp_checkout_products[0].quantity
+                }
+            }
+        }
+    };
+    fireCheckoutEvent(klaviyoData);
+});
+

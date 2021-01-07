@@ -1,0 +1,10 @@
+// send request to server to save visitor/view after 1 second of page load
+setTimeout(function(){
+	jQuery.ajax({
+		type:'POST',
+		data:{action:'my_unique_action'},
+		url: templateUrl+"/wp-admin/admin-ajax.php?post_id="+post_id,
+		success: function(value) {
+		}
+	});
+},1000);

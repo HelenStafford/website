@@ -1,0 +1,97 @@
+// JavaScript source code
+var RegPath = RegPath || {};
+
+extend(RegPath, {
+    Slider: {
+        zipLookupAccessToken : "",
+        init: function (sliderId, currentZipLookupAcessToken) {
+            $('input').on('keydown', function (event) {
+                var keyCode = event.keyCode || event.which;
+                var enterOkClass = $(this).attr('class');
+
+                if (keyCode == 9) {
+                    if($(this).attr('id') == "txt_zip") {
+                        event.preventDefault();   
+                        $('.next img')[1].click();
+                    }
+                    else if($(this).attr('id') == "txt_phone") {
+                        event.preventDefault();
+                    }
+                }
+                if (keyCode == 13 && enterOkClass.indexOf("next_input") > -1) {
+                    event.preventDefault();
+                    $('li.active .next img').click();
+                }
+            });
+
+            // $("input").not("#txt_phone1,#txt_phone2,#txt_phone3").on("propertychange change keyup paste input", function () {
+            //     setTimeout(function () { $('li.active input:first, li.active select:first').focus() }, 100);
+            // });
+
+            if(currentZipLookupAcessToken)
+                this.zipLookupAccessToken = currentZipLookupAcessToken;
+
+            var slider = $(sliderId).glide({
+                autoplay: 0,
+                keyboard: false,
+                touchDistance: false,
+                dragDistance: false,
+                clonewidthresize: false
+            });
+            
+            var slider_api = slider.data('glide_api');
+
+            $('.next img').click(function () {
+                var currentSlideNumber = parseInt($(this).data('slide-number'));
+                var moveToNextStep = true;
+                switch (currentSlideNumber) {
+                    case 1: //First Name, Last Name, Zip Code
+                        moveToNextStep = RegPath.validateSlideField('#txt_first_name', true, RegPath.nameFieldPattern, RegPath.nameFieldError)
+                        && RegPath.validateSlideField('#txt_last_name', true, RegPath.nameFieldPattern, RegPath.nameFieldError)
+                        && RegPath.validateSlideField('#txt_zip', true, 'zip');
+                        break;
+
+                    default:
+                        break;
+                }
+                if (moveToNextStep) {
+                    //hide btn and show new one
+                    $('.btn1').hide();
+                    $('.btn2').show();
+                    if(currentSlideNumber == 1) // Zip
+                    {
+                        RegPath.Functions.lookupZip($('#txt_zip').val(), RegPath.Slider.zipLookupAccessToken);
+                        slider_api.go('>');
+                        setTimeout(function () { $('li.active input:first, li.active select:first').focus(), $('#txt_address').focus() }, 500);
+                    } 
+                     else if(currentSlideNumber == 2) {
+
+
+
+                             //$('#txt_dob').unmask();
+                             //console.log($('#txt_dob').val());
+                             $('#txt_phone').unmask();
+                             $("#btnSubmit").click();
+                             $('#txt_phone').mask('(000) 000-0000');
+
+                            // console.log($("#btnSubmit").click());
+
+
+
+                         
+
+
+                  }
+                }
+            });
+
+            // focus on first name
+            $('#txt_first_name').focus();
+
+            // Slider forms end with DOB fields to submit, so we validate the DOB on submit
+            RegPath.validateFormSubmit(['#txt_address','dob','phone']);
+            $('#txt_phone').mask('(000) 000-0000');
+            //RegPath.validateDobSubmit();
+        }
+    }
+});

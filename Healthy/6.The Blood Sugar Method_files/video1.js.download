@@ -1,0 +1,41 @@
+jQuery(document).ready(function ($) {
+  $("a.contact-modal").colorbox({
+    width: "80%",
+    height: "70%",
+    html:
+      "<iframe src='contact.html' width='100%' height='" +
+      (document.body.offsetHeight * 0.7 - 76) +
+      "'></iframe>",
+    fixed: true,
+  });
+
+  $("a.terms-modal").colorbox({
+    width: "80%",
+    height: "70%",
+    html:
+      "<iframe src='terms.html' width='100%' height='" +
+      (document.body.offsetHeight * 0.7 - 76) +
+      "'></iframe>",
+    fixed: true,
+  });
+
+  $("a.privacy-modal").colorbox({
+    width: "80%",
+    height: "70%",
+    html:
+      "<iframe src='privacy.html' width='100%' height='" +
+      (document.body.offsetHeight * 0.7 - 76) +
+      "'></iframe>",
+    fixed: true,
+  });
+
+  $("a.guarantee-modal").colorbox({
+    width: "80%",
+    height: "70%",
+    html:
+      "<iframe src='guarantee.html' width='100%' height='" +
+      (document.body.offsetHeight * 0.7 - 76) +
+      "'></iframe>",
+    fixed: true,
+  });
+});

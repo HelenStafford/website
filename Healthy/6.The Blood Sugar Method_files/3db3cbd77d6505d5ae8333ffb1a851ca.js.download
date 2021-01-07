@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>404 Page Not Found</title>
+<link rel='shortcut icon' type='image/x-icon' href='/images/favicon.ico' />
+<style>
+    body {
+        width: 35em;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Page not found!</h1>
+<p>Sorry, but the page you were looking for could not be found.</p>
+</body>
+</html>

@@ -1,0 +1,1047 @@
+//set up global variables
+var iValidateAddress = 0;
+var step = 1;
+var totalStep = 1;
+var oForm;
+var cFormName;
+var doSubmit;
+var ajaxSubmit = 0;
+var okToSubmit = 1;
+var noValidate = false;
+
+$(document).ready(function() {
+	$("#submitButtonLink").click(function(e) {
+		e.preventDefault();
+		stepAll('captureForm', 1);
+		return false;
+	});
+
+	var gtm_id = document.getElementById('gtm_id').value;
+
+	if (gtm_id.length) {
+		initGoogleTagManager(window, document, 'script', 'tagManagerDataLayer', gtm_id);
+	}
+});
+
+function makeHiddenForm(formName) {
+	$('#captureForm_hidden').remove();
+	var hiddenForm = $('<form>').attr('name', 'captureForm_hidden').attr('id', 'captureForm_hidden').attr('action', $('#' + formName).attr('action'));
+	$('body').append(hiddenForm);
+	$('#' + formName + ' input, #' + formName + ' select, #' + formName + ' textarea').each(function(a, b){
+		if($(this).attr('id') == 'textReq' || $(this).attr('type') == 'hidden' || $(this).val() && $(this).val() != '0') {
+			var ele = $('<input>').attr('type', 'hidden').attr('name', $(this).attr('name')).attr('id', $(this).attr('id')).val($(this).val());
+			hiddenForm.append(ele);
+		}
+	});
+}
+
+function initGoogleTagManager(w, d, s, l, i) {
+	if (i) {
+		w[l] = w[l] || [];
+		w[l].push({
+			'gtm.start': new Date().getTime(), event: 'gtm.js'
+		});
+		var f = d.getElementsByTagName(s)[0],
+			j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+		j.async = true;
+		j.src =
+			'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+		f.parentNode.insertBefore(j, f);
+	} else {
+		w[l] = [];
+	}
+}
+
+function stepAll(formName, iDoSubmit) {
+	if(noValidate == true) {
+		makeHiddenForm(formName);
+		formName = 'captureForm_hidden';
+	}
+	doSubmit = iDoSubmit;
+	eval("oForm = document." + formName);
+	cFormName = formName;
+	//hide the submit button
+	if ($('#submitButton, .submitButton')) {
+		$('#submitButton, .submitButton').css('display', "none");
+	} else if ($('#submitButton' + step)) {
+		$('#submitButton' + step).css('display', "none");
+	}
+
+	//show the loader
+	if ($('#loadingGraphic, .loadingGraphic')) {
+		$('#loadingGraphic, .loadingGraphic').css('display', "block");
+	} else if ($('#loadingGraphic' + step)) {
+		$('#loadingGraphic' + step).css('display', "block");
+	}
+
+	var okay = true;
+	bSubmitted = true;
+
+	iValidateAddress = 0;
+
+	var x = 0;
+	for (x = 0; x < oForm.elements.length; x++) {
+
+
+		var ElementName = oForm.elements[x].name;
+
+		//standard html input=checkbox
+		if (oForm.elements[x].id == "agree") {
+
+			if (!checkDisClaimer(ElementName, "Please click the checkbox to continue.")) {
+				return bSubmitted = okay = false;
+				break;
+			}
+
+		}
+
+		//for pages that use image based privacy checkbox
+		if (oForm.elements[x].id == "privacy") {
+			if (oForm.elements[x].value == 0) {
+				failed("Please click the Checkbox to continue.");
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+
+		if (oForm.elements[x].id == "firstname") {
+			if (!CheckNull($('#firstname'), "First Name")) {
+				return bSubmitted = okay = false;
+			}
+			if (!DoRegEx1($('#firstname').val(), "First Name")) {
+				return bSubmitted = okay = false;
+			}
+			if (!checkRepeat("firstname", "First Name")) {
+				return bSubmitted = okay = false;
+			}
+			if (($('#firstname').val() == "Jane" || $("#firstname").val() == "John") && $("#lastname").val() == "Doe") {
+				failed("Please enter a valid first and last name");
+				return bSubmitted = okay = false;
+			}
+			if ($('#firstname').val() == $('#lastname').val()) {
+				failed("Please enter a valid first and last name");
+				return bSubmitted = okay = false;
+			}
+		}
+
+		if (oForm.elements[x].id == "lastname") {
+			if (!CheckNull($("#lastname"), "Last Name")) {
+				return bSubmitted = okay = false;
+			}
+			if (!DoRegEx1($('#lastname').val(), "Last Name")) {
+				return bSubmitted = okay = false;
+			}
+			if (!checkRepeat("lastname", "Last Name")) {
+				return bSubmitted = okay = false;
+			}
+			if (okay == true && !(iValidateAddress & 2)) {
+				iValidateAddress += 2;
+			}
+		}
+		if (oForm.elements[x].id == "email") {
+			if (!CheckNull($("#email"), "E-mail")) {
+				return bSubmitted = okay = false;
+			}
+
+			if (!validateEmail($("#email").val())) {
+				failed("Please enter a valid email address.");
+				try {
+					$("#email").focus();
+				} catch (err) {
+					//
+				}
+				return bSubmitted = okay = false;
+			}
+			if (!DoRegEx2($("#email"), "E-mail")) {
+				return bSubmitted = okay = false;
+			}
+			if ($("#confirmemail").val()) {
+				if (oForm.email.value != oForm.confirmemail.value) {
+					failed("Your Email Addresses do not match!  Please try again.");
+					oForm.confirmemail.value = '';
+					oForm.confirmemail.focus();
+					return bSubmitted = okay = false;
+				}
+			}
+		}
+
+		if (oForm.elements[x].id == "area_code" || oForm.elements[x].id == "phone") {
+			if (!validatePhone()) {
+				return bSubmitted = okay = false;
+			}
+			if (okay == true && !(iValidateAddress & 1)) {
+				iValidateAddress += 1;
+			}
+		}
+
+		if (oForm.elements[x].id == "textReq") {
+			if (oForm.elements[x].name == "address") {
+				if (oForm.elements[x].value == "") {
+					failed("Please enter a valid Address to continue.");
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+				if (okay == true && !(iValidateAddress & 4)) {
+					iValidateAddress += 4;
+				}
+			} else if (oForm.elements[x].name == "city") {
+				if (oForm.elements[x].value == "") {
+					failed("Please enter your City to continue.");
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+				if (!checkRepeat("city", "City")) {
+					return bSubmitted = okay = false;
+				}
+				if (okay == true && !(iValidateAddress & 8)) {
+					iValidateAddress += 8;
+				}
+			} else if (oForm.elements[x].name == "zipcode") {
+				if (oForm.elements[x].value == "" || oForm.elements[x].value.length < 4) {
+
+					failed("Please enter a valid Zipcode to continue.");
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+				if (okay == true && !(iValidateAddress & 32)) {
+					iValidateAddress += 32;
+				}
+			} else if (oForm.elements[x].name == "state") {
+				if (oForm.elements[x].value == "" || oForm.elements[x].value.length < 2) {
+
+					failed("Please enter a valid State to continue.");
+
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+				if (okay == true && !(iValidateAddress & 16)) {
+					iValidateAddress += 16;
+				}
+			} else {
+				if (oForm.elements[x].value == "") {
+					failed("Please enter a value for this field.");
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+			}
+		}
+
+		if (oForm.elements[x].id == "hiddenReq") {
+			if (oForm.elements[x].value == "") {
+				failed("Please enter a value for this field.");
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+
+		if (oForm.elements[x].id == "selectReq") {
+			varSelect = new RegExp("Select");
+			if (oForm.elements[x].name == "state") {
+				if (oForm.elements[x].value.match(varSelect) || oForm.elements[x].value == "") {
+					failed("Please Select a State to continue.");
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+				if (okay == true && !(iValidateAddress & 16)) {
+					iValidateAddress += 16;
+				}
+			} else {
+				if (oForm.elements[x].value.match(varSelect) || oForm.elements[x].value == "") {
+					failed("Please select an option for this field.");
+					oForm.elements[x].focus();
+					return bSubmitted = okay = false;
+					break
+				}
+			}
+		}
+
+		if (oForm.elements[x].id == "checkReq") {
+			if (oForm.elements[x].checked == false) {
+				failed("The Checkbox must be checked to continue.");
+				oForm.elements[x].focus();
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "YN1") {
+			var xx = x++;
+			if (oForm.elements[x].checked == false && oForm.elements[xx].checked == false) {
+				failed("Please answer all of the Yes/No questions.");
+				oForm.elements[x].focus();
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "ccNum") {
+			var aCCSplit = oForm.elements[x].value.split(" ");
+			var vCCNum = aCCSplit.join("");
+			var aCCSplit = vCCNum.split("-");
+			var iCCNum = aCCSplit.join("");
+			oForm.elements[x].value = iCCNum;
+			var expDate = $("#ccMonth").val() + "/" + $("#ccYear").val();
+			//alert(iCCNum);
+
+			if (!checkCC(iCCNum, expDate)) {
+				failed("Please enter a valid Credit Card Name, Number and Expiration Date.");
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "checkStart") {
+			if (!oneOrMore(x)) {
+				failed("Please select at least one Interest.");
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "captcha_input") {
+			if (oForm.elements[x].value == "") {
+				failed("Please enter your Confirmation Code.");
+				return bSubmitted = okay = false;
+				break
+			}
+		}
+	}
+	//end for loop
+
+	//all is good, we are going to do the ajax validation call
+	if (okay == true && iValidateAddress > 0) {
+		validateAddress(iValidateAddress);
+	} else if (okay == true && iValidateAddress == 0 && doSubmit) {
+		oForm.submit();
+	} else if (okay == true && iValidateAddress == 0 && !doSubmit) {
+		eval('step' + step + '()');
+	}
+
+}
+
+//preload new conf code gif
+if (document.location.protocol != 'https:') {
+	preload_image = new Image(120, 40);
+	preload_image.src = "http://top10workfromhomejobs.com/newConf.gif";
+};
+
+function validateAddress(iVal) {
+	var allValid = 1;
+	var urlstring = '';
+
+	//see if we are passing dummy data
+	postVars = 'iVal=' + iVal;
+	postVars += '&step=' + step;
+	try {
+		postVars += '&cSource=' + document.captureForm.cSource.value;
+	} catch (ex) {
+		//dosen't exist lets track it down
+		try {
+			postVars += '&cSource=ID-' + document.captureForm.SourceID.value;
+		} catch (ex) {
+			postVars += '&cSource=NotAvailable';
+		}
+	}
+	if ($('#captcha_input').length && step == totalStep) {
+		//get variables from captcha fields
+		postVars += '&captcha_a=' + $('#captcha_a').val();
+		postVars += '&captcha_b=' + $('#captcha_b').val();
+		postVars += '&captcha_input=' + $('#captcha_input').val();
+	}
+
+	if ($('select[name="country"]').length && $('select[name="country"]').val() != 'US' && $('select[name="country"]').val() != 'CA') {
+		postVars += '&firstname=' + $('input[name="firstname"]').val();
+		postVars += '&lastname=' + $('input[name="lastname"]').val();
+		postVars += '&email=' + $('input[name="email"]').val();
+	} else {
+		postVars += $('#' + cFormName).serialize();
+	}
+	/*
+	for (x=0; x<document.captureForm.elements.length; x++){
+		try {
+		    var ElementName =  document.captureForm.elements[x].name;
+		    var ElementValue = document.captureForm.elements[x].value;
+		    if(postVars.indexOf(ElementName) == -1 && ElementName.indexOf("captcha") == -1){
+		    	if(checkSend(document.captureForm.elements[x])){
+		    		postVars += '&' + ElementName + "=" + ElementValue;
+                }
+            }
+		} catch(ex) {
+			//alert(ex);
+		}
+    }
+    */
+	$.ajax({
+		type: "POST",
+		url: "/plugins/validateData/validateAddress.php",
+		data: postVars,
+		success: validateAddressReturn,
+		datatype: 'xml'
+	});
+}
+
+//called upon recieval of ajax call
+function validateAddressReturn(XML) {
+	//alert (XML.responseText);
+
+	//lets make sure personal validation is good
+
+	//if there is an <error> node, then we are validating address, etc.
+	if ($(XML).find('error').text()) {
+
+		if ($(XML).find('error').text() > 0) {
+			//there was an error, alert the user and dont go forward
+			message = $(XML).find('message').text(); // xmldoc.getElementsByTagName('message')[0].firstChild.nodeValue;
+			error = $(XML).find('error').text();
+			okToSubmit = 0;
+			failed(message, error);
+
+		} else {
+			//we're on a multistep page, and not at the end so lets move forward
+			//hide the loading graphic
+			step++;
+			/*
+            if($('#loadingGraphic')){
+                $('#loadingGraphic').css('display', "none");
+            }
+            if($('#loadingGraphic'+step)){
+                $('#loadingGraphic'+step).css('display', "none");
+            }
+			*/
+			okToSubmit = 1;
+		}
+	} else {
+		//we didnt get an <error>, lets assume that it is ok.
+		okToSubmit = 1;
+	}
+
+	//alert ("okToSubmit? "+okToSubmit);
+
+	//if there is an <okcaptcha> node, then we are validating the captcha.
+	if ($(XML).find('okcaptcha').text()) {
+
+		var okcaptcha = $(XML).find('okcaptcha').text();
+
+		if (okcaptcha == 1 && okToSubmit == 1) {
+			//conf code matches
+			okToSubmit = 1;
+		} else if (okcaptcha == 1 && okToSubmit == 0) {
+			//the captcha is fine, but there was a different error.
+			//dont get a new captcha.
+			okToSubmit = 0;
+		} else if (okcaptcha == 0) {
+			//bad captcha - get new conf code!
+			var captcha_salt = $(XML).find('captcha_salt').text();
+			var captcha_b = $(XML).find('captcha_b').text();
+
+			$('#captchaImage').src = "http://top10workfromhomejobs.com/newConf.gif";
+			$('#captchaImage').src = "http://inc.bethebossnetwork.com/logic/captcha_image.php?captcha_a=" + captcha_salt + "&captcha_b=" + captcha_b + "";
+
+			failed("Your Confirmation Code did not match the text displayed on the page!  Please try again.");
+
+			$('#captcha_a').val() = captcha_salt;
+			$('#captcha_b').val() = captcha_b;
+
+			$('#captcha_input').val() = "";
+			try {
+				$('#captcha_input').focus();
+			} catch (err) {
+				//
+			}
+			okToSubmit = 0;
+
+			try {
+				if (fnWhenDone) {
+					fnWhenDone();
+				}
+			} catch (ex) {
+
+			}
+		}
+	} else if (okToSubmit == 1 && !$('#captcha_input').val()) {
+		//we are on a page w/o a captcha, ok to submit!
+		okToSubmit = 1;
+	} else {
+		//somethin broke
+		okToSubmit = 0;
+	}
+
+	//if there is a prev_cap value, put that back into the hidden value.
+	if ($(XML).find('prev_cap').text()) {
+		var prev_cap = $(XML).find('prev_cap').text();
+		oForm.prev_cap.value = prev_cap;
+	}
+	//if xml returned fail = 1 we need to set the iFailedValidation form variable to 1 so the lead will not sell
+	if ($(XML).find('fail').text()) {
+		var fail = $(XML).find('fail').text();
+		oForm.iFailedValidation.value = fail;
+		//alert("failed");
+	}
+	if (okToSubmit == 1) {
+		if (ajaxSubmit == 1) {
+			doAjaxSubmit();
+		} else {
+			if (doSubmit) {
+				oForm.submit();
+			} else {
+				eval('step' + step + '()');
+			}
+		}
+	}
+}
+
+function doAjaxSubmit() {
+	var requestString = '';
+	/*
+    for (x=0; x<oForm.elements.length; x++){
+	    var ElementName =  oForm.elements[x].name;
+		var ElementVal = oForm.elements[x].value;
+		requestString = requestString + ElementName + "=" + ElementVal + "&";
+	}
+	*/
+	requestString += $(oForm).serialize() + "&";
+	requestString += "iAjax=1";
+
+	$.ajax({
+		type: "POST",
+		url: "/betheboss/process.php",
+		data: requestString,
+		success: function(text) {
+			var myStart = /\%\%start\%\%/;
+			var myEnd = /\%\%end\%\%/;
+			var startPos = text.search(myStart) + 9;
+			var endPos = text.search(myEnd);
+			var iLength = endPos - startPos;
+			var iTankID = text.substring(startPos, endPos);
+			$('#iTankID').val(iTankID);
+			exitPopFunc(text);
+		},
+		datatype: 'text'
+	});
+}
+
+function failed(msg, errcode) {
+	//alert the failure message
+	alert(msg);
+	//show the submit button
+	if ($("#submitButton, .submitButton")) {
+		$("#submitButton, .submitButton").css("display", "block");
+	} else if ($('#submitButton' + step)) {
+		$("#submitButton" + step).css("display", "block");
+	}
+	//hide the loader
+	if ($("#loadingGraphic, .loadingGraphic")) {
+		$("#loadingGraphic, .loadingGraphic").css("display", "none");
+	} else if ($("#loadingGraphic" + step)) {
+		$("#loadingGraphic" + step).css("display", "none");
+	}
+	return null;
+}
+
+// Pop-under funtionality
+var bSubmitted = false;
+
+
+//Initialize our Ajax
+if (window.XMLHttpRequest) {
+	//mozilla/safari
+	xmlHttpRequestObject = new XMLHttpRequest();
+} else {
+	//other less compliant browsers
+	xmlHttpRequestObject = new ActiveXObject("Microsoft.XMLHTTP");
+}
+
+// onUnload Exit Pop Functionality to Display Additional Offers
+function onul(cURL, iType, iExit) {
+	if (!bSubmitted && iType != 3 && iType != 4 && iExit != 1) {
+		window.open(cURL);
+		self.focus();
+	}
+}
+
+var isNN = (navigator.appName.indexOf("Netscape") != -1);
+
+function oneOrMore(elementStart) {
+	var okay = 0;
+	for (x = elementStart; x < oForm.elements.length; x++) {
+		//alert(oForm.elements[x].checked + " " + oForm.elements[x].id)
+		if (oForm.elements[x].checked && (oForm.elements[x].id == "checkThis" || oForm.elements[x].id == "checkStart" || oForm.elements[x].id == "checkEnd")) {
+			okay = 1;
+		}
+		if (okay == 0 && oForm.elements[x].id == "checkEnd") {
+			return false;
+			break
+		} else if (okay != 0 && oForm.elements[x].id == "checkEnd") {
+			return true;
+			break
+		}
+	}
+}
+
+function checkCC(ccNum, ccExp) {
+	//Credit card validator for AMEX, VISA, MasterCard only. Allows spaces, dashes, or no separator between digit groups according to the layout (4-6-5 for AMEX, 4-4-4-4 for Visa and Mastercard)
+	var ccRegExp = new RegExp(/\d{16}|\d{15}/);
+	//Validates MM/YY for rough checking credit card expiration dates.
+	var ccExpRegExp = new RegExp(/^((0[1-9])|(1[0-2]))\/(\d{4})$/);
+	//alert(ccNum + ":" + ccRegExp.test(ccNum) + ", " + ccExp + ccExpRegExp.test(ccExp))
+	if (ccRegExp.test(ccNum) && ccExpRegExp.test(ccExp)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function checkExtraElements() {
+	var returnVal = true
+	for (x = 0; x < oForm.elements.length; x++) {
+
+		try {
+			var AlertElement = oForm.elements[x].name + "Text";
+			var AlertText = $('#' + AlertElement).val();
+		} catch (ex) {
+			//alert(AlertElement)
+			var AlertText = "";
+		}
+
+		if (oForm.elements[x].id == "textReq") {
+			if (oForm.elements[x].value == "") {
+				if (AlertText != "") {
+					failed(AlertText);
+				} else {
+					failed("Please enter a value for this field.");
+				}
+				oForm.elements[x].focus();
+				returnVal = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "selectReq") {
+			varSelect = new RegExp("Select");
+			if (oForm.elements[x].value.match(varSelect) || oForm.elements[x].value == "") {
+				if (AlertText != "") {
+					failed(AlertText);
+				} else {
+					failed("Please select an option for this field.");
+				}
+				oForm.elements[x].focus();
+				returnVal = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "YN1") {
+			var xx = x++;
+			if (oForm.elements[x].checked == false && oForm.elements[xx].checked == false) {
+				if (AlertText != "") {
+					failed(AlertText);
+				} else {
+					failed("Please answer all of the Yes/No questions.");
+				}
+				oForm.elements[x].focus();
+				returnVal = false;
+				break
+			}
+		}
+		if (oForm.elements[x].id == "checkReq") {
+			if (oForm.elements[x].checked == false) {
+				if (AlertText != "") {
+					failed(AlertText);
+				} else {
+					failed("Please answer all of the Yes/No questions.");
+				}
+				oForm.elements[x].focus();
+				returnVal = false;
+				break
+			}
+		}
+	}
+	return returnVal;
+}
+
+function checkDisClaimer(field, msg) {
+
+	if (!document.getElementById(field).checked) {
+		if (document.getElementById(field + "Text")) {
+			failed(document.getElementById(field + "Text").value);
+		} else {
+			failed(msg);
+		}
+		document.getElementById(field).focus();
+		return false;
+	} else {
+		return true;
+	}
+
+}
+// Autotab functionality
+function autoTab(input, len, e) {
+	var keyCode = (isNN) ? e.which : e.keyCode;
+	var filter = (isNN) ? [0, 8, 9] : [0, 8, 9, 16, 17, 18, 37, 38, 39, 40, 46];
+	if (input.value.length >= len && !containsElement(filter, keyCode)) {
+		input.value = input.value.slice(0, len);
+		input.form[(getIndex(input) + 1) % input.form.length].focus();
+	}
+
+	// <DIV> toggle functionality
+	function toggle(obj, show) {
+		var el = document.getElementById(obj);
+		if (show != 0) {
+			el.style.display = 'block';
+		} else {
+			el.style.display = 'none';
+		}
+	}
+
+	// Contains array data
+	function containsElement(arr, ele) {
+		var found = false,
+			index = 0;
+		while (!found && index < arr.length)
+			if (arr[index] == ele)
+				found = true;
+			else
+				index++;
+		return found;
+	}
+
+	function getIndex(input) {
+		var index = -1,
+			i = 0,
+			found = false;
+		while (i < input.form.length && index == -1)
+			if (input.form[i] == input) index = i;
+			else i++;
+		return index;
+	}
+	return true;
+}
+
+
+/**************** End Radio Button Check ***********/
+function CheckNull(field, Readable) {
+	if (!field.val()) {
+		failed("Please enter your " + Readable + ".")
+		try {
+			field.focus();
+		} catch (err) {
+			//
+		}
+		return false;
+	} else {
+		return true;
+	}
+}
+
+function validatePhone() {
+
+	var re = /^(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}(?:\-?|\ ?))[2-9]\d{2}[- ]?\d{4}$/;
+	// var re = new RegExp(/^(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}(?:\-?|\ ?))[2-9]\d{2}[- ]?\d{4}$/);
+
+	if (!$("#area_code").val() && $("#phone").val()) {
+		var theAreaCode = $("#phone").val().slice(0, 3)
+		var theExchange = $("#phone").val().slice(3, 6)
+		var theEnd = $("#phone").val().slice(4, 10)
+		var theNumber = $("#phone").val();
+	} else {
+		var theAreaCode = $("#area_code").val()
+		var theExchange = $("#phone1").val()
+		var theEnd = $("#phone2").val()
+		var theNumber = theAreaCode + theExchange + theEnd;
+	}
+
+	var OK = re.test(theNumber);
+
+	if (!OK) {
+		failed("Please enter a valid Phone Number.");
+		return false;
+	}
+
+	/* Check for repeating digits in area code */
+	if ((theAreaCode == "444") || (theAreaCode == "555") || (theAreaCode == "666") || (theAreaCode == "800") || (theAreaCode == "999") || (theAreaCode == "900")) {
+		failed("Please enter a valid Area Code.");
+		try {
+			$("#area_code").focus();
+		} catch (ex) {
+			$("#phone").focus();
+		}
+		return false;
+	}
+	/* Check exchange for 555 */
+	if (theExchange == "555") {
+		failed("Please enter a valid Phone Number.");
+		try {
+			$("#phone1").focus();
+		} catch (ex) {
+			$("#phone").focus();
+		}
+		return false;
+	}
+
+	return true;
+
+}
+
+/**************** REGEX ***********/
+// names: only alpha and .,-"'
+function DoRegEx1(strng, desc) {
+	var illegalChars = /[^A-Za-z\.\"\'\- ]+/
+	if (illegalChars.exec(strng)) {
+		failed(desc + " is not valid!");
+		return false;
+	} else {
+		return true;
+	}
+
+}
+// email: no !#$%^&*(){}[],
+function DoRegEx2(field, desc) {
+	DoRegEx3(field, desc);
+	var strng = field.val();
+	var illegalChars = /[ \$\!\#\%\&\*\^\(\)\{\}\[\]\,]+/
+	if (illegalChars.exec(strng)) {
+		failed(desc + " is not valid!");
+		return false;
+	} else {
+		return true;
+	}
+}
+// email: fix email .co
+function DoRegEx3(field, desc) {
+	var strng = field.val();
+	var lastchar = strng.lastIndexOf('.');
+	var strnglength = strng.length;
+	var strngdiff = parseFloat(strnglength - lastchar);
+	var dmn = strng.substring(strnglength, lastchar);
+	if (dmn == '.co') {
+		var strng = strng.substring(0, lastchar) + ".com";
+		field.val(strng);
+	}
+	return true;
+}
+
+// RegEx email validation: http://www.4guysfromrolla.com/webtech/052899-1.shtml
+function validateEmail(src) {
+	var emailReg = "";
+	var regex = new RegExp('^[\\w-_\.][\\w-_\.][\\w-_\.]*[\@][\\w-][\\w--\.][\\w--\.][\\w-\.]*[\.][\\w-_\.]+[\\w]$');
+	//alert(regex.test(src));
+	//return regex.test(src);
+	return true;
+}
+
+function validateInteger(strValue) {
+	/************************************************
+	DESCRIPTION: Validates that a string contains only
+	valid integer number.
+
+	PARAMETERS:
+	strValue - String to be tested for validity
+
+	RETURNS:
+	True if valid, otherwise false.
+	**************************************************/
+	var objRegExp = /(^-?\d\d*$)/;
+
+	//check for integer characters
+	return objRegExp.test(strValue);
+}
+
+function placeAd(xfile, xright, xtop, xwide, xhi) {
+	var x = "<div id=\"Layer1\" style=\"position: absolute; right: " + xright + "px; top: " + xtop + "px; width: " + xwide + "px; height: " + xhi + "px; z-index: 1\">";
+	x = x + "<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" codebase=\"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0\" width=\"" + xwide + "\" height=\"" + xhi + "\">";
+	x = x + "<param name=\"movie\" value=\"" + xfile + "\" />";
+	x = x + "<param name=\"quality\" value=\"high\" />";
+	x = x + "<param name=\"wmode\" value=\"transparent\" />";
+	x = x + "<embed src=\"" + xfile + "\" width=\"" + xwide + "\" height=\"" + xhi + "\" quality=\"high\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" type=\"application/x-shockwave-flash\" wmode=\"transparent\"></embed>";
+	x = x + "</object></div>";
+	document.write(x);
+}
+
+function toggle(obj, show) {
+
+	if ($(obj)) {
+		var el = $(obj);
+
+		if (show != 0) {
+			el.style.display = 'block';
+		} else {
+			el.style.display = 'none';
+		}
+	}
+}
+
+function buildFlash() {
+	objects = document.getElementsByTagName("object");
+	for (var i = 0; i < objects.length; i++) {
+		objects[i].outerHTML = objects[i].outerHTML;
+	}
+}
+
+// Privacy Graphical Checkbox
+function setPrivacy() {
+	var iPrivacy = oForm.privacy.value;
+	if (iPrivacy != '1') {
+		oForm.privacy.value = '1';
+		MM_swapImage('check-box', '', 'images/checkbox-on.gif', 0)
+	} else {
+		oForm.privacy.value = '0';
+		MM_swapImage('check-box', '', 'images/checkbox-off.gif', 0)
+	}
+}
+
+function openPrivacy(url) {
+	window.open(url, 'PrivacyPolicy', 'width=760,height=490,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
+}
+
+function checkRepeat(field, desc) {
+
+	var okay = false;
+
+	var illegalChars = /([ -~])\1{2}/
+
+
+	if ($('#' + field) && $('#' + field).val()) {
+		//if we can get this by id
+		strng = $('#' + field).val();
+	} else {
+		//get it by name
+		eval("strng = oForm." + field + ".value");
+	}
+
+	var illegalChars2 = /[bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ]{6}/
+	var illegalChars3 = /[aeiouyAEIOUY]/
+	if (illegalChars.exec(strng)) {
+		okay = false;
+	} else {
+		if (strng.length > 1) {
+			if (strng.length == 2 && strng.substr(0, 1) == strng.substr(1, 1)) {
+				okay = false;
+			} else {
+				if (strng.length > 2 && (illegalChars2.exec(strng) || !illegalChars3.test(strng))) {
+					okay = false;
+				} else {
+					okay = true;
+				}
+			}
+		} else {
+			okay = false;
+		}
+	}
+	if (okay == false) {
+		failed(desc + " is not valid!");
+	}
+	return okay;
+}
+
+function alphaRepeat(field, desc) {
+	var okay = false
+	var illegalChars = /([a-zA-Z])\1{2}/
+
+	if ($('#' + field) && $('#' + field).val()) {
+		//if we can get this by id
+		strng = $('#' + field).val();
+	} else {
+		//get it by name
+		eval("strng = oForm." + field + ".value");
+	}
+
+	var illegalChars2 = /[bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ]{6}/
+	var illegalChars3 = /[aeiouyAEIOUY]/
+	if (illegalChars.exec(strng)) {
+		okay = false;
+	} else {
+		if (strng.length > 1) {
+			if (strng.length == 2 && strng.substr(0, 1) == strng.substr(1, 1)) {
+				okay = false;
+			} else {
+				if (strng.length > 2 && (illegalChars2.exec(strng) || !illegalChars3.test(strng))) {
+					okay = false;
+				} else {
+					okay = true;
+				}
+			}
+		} else {
+			okay = false;
+		}
+	}
+
+	if (okay == false) {
+		failed(desc + " is not valid!");
+	}
+
+	return okay;
+}
+
+function processReqChange() {
+	// only if req shows "loaded"
+	if (xmlHttpRequestObject.readyState == 4) {
+		// only if "OK"
+		if (xmlHttpRequestObject.status == 200) {
+			// ...processing statements go here...
+
+		} else {
+			alert("There was a problem retrieving the XML data:\n" +
+				xmlHttpRequestObject.statusText);
+		}
+	} else {
+		//document.body.style.cursor='url("http://dev.mlmgo.com/intranet/images/circle-loader.gif"), wait';
+	}
+}
+
+function timerLoop(formName) {
+	var thisForm = eval("document." + formName)
+	var postVars = "iTankID=" + thisForm.iTankID.value;
+	$.ajax({
+		type: "POST",
+		url: "/plugins/updateTimer.php",
+		data: postVars,
+		success: doUpdated()
+	});
+}
+
+function doUpdated(XML) {
+	//update successful
+}
+
+function moveElementsToForm(from, to) {
+	for (x = 0; x < from.elements.length; x++) {
+		var currentElement = from.elements[x];
+		var fieldRef = document.createElement('input');
+		fieldRef.setAttribute("type", "hidden");
+		fieldRef.setAttribute("name", currentElement.name);
+		fieldRef.setAttribute("value", currentElement.value);
+		if (!to[currentElement.name]) {
+			if (typeof fieldRef != "undefined") {
+				to.appendChild(fieldRef);
+			}
+		} else {
+			//form element already exists with that name. Populate
+			if (to[currentElement.name].type != 'select-one') {
+				to[currentElement.name].value = currentElement.value;
+			} else {
+				//select box. Must select proper field.
+				for (aSelect = 1; aSelect < to[currentElement.name].options.length; aSelect++) {
+					if (to[currentElement.name].options[aSelect].value == currentElement.value) {
+						to[currentElement.name].selectedIndex = aSelect;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+function kH(e) {
+	var pK = e ? e.which : window.event.keyCode;
+	if (pK == 13) {
+		if (jQuery.isFunction(submitFormFunction)) {
+			submitFormFunction();
+		} else {
+			stepAll('captureForm', 1);
+		}
+	}
+	return pK != 13;
+}
+document.onkeypress = kH;
+if (document.layers)
+	document.captureEvents(Event.KEYPRESS);

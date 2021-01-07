@@ -1,0 +1,326 @@
+var recaptchaOnSuccess = function () {
+    $('form').unbind('submit');
+    $("form").submit();
+}
+
+///
+///  RegPath is in charge of validations and other flow-type client-side functionality
+///
+///  Testing Url versioning
+var RegPath = {
+    isConfirmCheck: false,
+    reCAPTCHACheck: true,
+    reCAPTCHASucceed: function () {
+        $("#recaptcha_required").val("done");
+    },
+    reCAPTCHAReset: function () {
+        $("#recaptcha_required").val("");
+    },
+
+    loadTrustedForm: function () {
+
+        var field = 'xxTrustedFormCertUrl';
+        var provideReferrer = false;
+        var tf = document.createElement('script');
+        tf.type = 'text/javascript'; tf.async = true;
+        tf.src = '//api.trustedform.com/trustedform.js?provide_referrer=' + escape(provideReferrer) + '&field=' + escape(field) + '&l=' + new Date().getTime() + Math.random();
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(tf, s);
+
+        //this.waitForTrustedFormScreenShot();
+    },
+
+    loadJornaya: function () 
+    {
+        var input = $('<input type="hidden" id="leadid_token" name="universal_leadid"  />');
+        $('form').append(input);   
+
+        var s = document.createElement('script');
+        s.id = 'LeadiDscript_campaign';
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = '//create.lidstatic.com/campaign/aac3d0d6-feed-beef-cafe-e88d3d2ce25e.js?snippet_version=2';
+
+
+        var LeadiDscript = document.getElementsByTagName('script')[1]; //document.getElementById('LeadiDscript');
+        LeadiDscript.parentNode.insertBefore(s, LeadiDscript);
+    },
+
+
+    trustedFormFinished: false,
+    trustedFormRequired: false,
+
+    submitOverlayLayer: "submit-overlay",
+    submitOverlayTextLayer: "submit-overlay-text",
+    submitOverlayText: "Thank You!<br /><br />Please wait while we load the next Offer...",
+    showSubmitOverlay: function () {
+        if ($('#' + RegPath.submitOverlayLayer).length > 0) {
+            if ($('#' + RegPath.submitOverlayTextLayer).length > 0) {
+                $('#' + RegPath.submitOverlayTextLayer).html(this.submitOverlayText);
+            }
+            $('#' + RegPath.submitOverlayLayer).show();
+        }
+    },
+    SkipOverLayEvent: function () {
+        $('#skip a').click(function(){
+            RegPath.showSubmitOverlay();
+        });
+    },
+
+    fullPhoneFieldPattern: /^\d{10}$/,
+
+    fullPhoneFieldError: 'Please enter a 10-digit phone number',
+
+    nameFieldPattern: /^[a-zA-Z.\\'\\-\\s]+$/,
+
+    nameFieldError: "#{field} can only contain letters, hyphens, spaces or apostrophes",
+
+    submitValidation: [],
+
+    submitPopOverUrl: "",
+
+    isSubmitValidationSet: false,
+
+    stopMultipleSubmit: true,
+
+    validateSlideField: function (fieldName, required, validator, errorMsg) {
+        // we don't want validity to disable form submits
+        // since we're not actually submitting the form, just using validity to validate
+        this.stopMultipleSubmit = false;
+
+        $.validity.start();
+
+        if (required)
+            $(fieldName).require();
+
+        if (validator) {
+            if (errorMsg)
+                $(fieldName).match(validator, errorMsg);
+            else
+                $(fieldName).match(validator);
+        }
+
+        var results = $.validity.end();
+
+        this.stopMultipleSubmit = true; // one off validations should re-allow submit
+
+
+        return results.valid;
+    },
+    validateEmailField: function () {
+        $("#txt_email").require().match('email', 'Please verify you have correctly entered your email address');
+    },
+    validateDobField: function () {
+        $('#ddl_dob_month').require();
+        $('#ddl_dob_day').require();
+        $('#ddl_dob_year').require();
+        $('#hdn_dob').assert(function () {
+            if ($('#hdn_dob').val().length == 10) // dob should always be mm/dd/yyyy format
+            {
+                var dateOfBirth = moment($('#hdn_dob').val(), 'MM/DD/YYYY');
+                return (dateOfBirth != null && dateOfBirth.isValid());
+            }
+            else {
+                return false;
+            }
+        }, 'Please enter a valid #{field}');
+    },
+    isFormSubmit: false,
+    validateFormSubmit: function (args, popOverUrl) {
+        if (args && $.isArray(args)) {
+            for (var i = 0; i < args.length; i++) {
+                this.submitValidation.push(args[i]);
+            }
+        }
+        if (popOverUrl && popOverUrl.length >
+            0) {
+            this.submitPopOverUrl = popOverUrl;
+        }
+
+        // Do not set Validity more than once per page load since it can cause multiple instances to run on submit
+        if (!this.isSubmitValidationSet) {
+            if (this.submitPopOverUrl.length > 0) {
+                $.validity.outputs.metaValidation.resultsValidFunctions.push("RegPath.postValidationPopOver();");
+            }
+
+            $("form").validity(function () {
+
+
+                if (RegPath.reCAPTCHACheck) {
+                    $('#recaptcha_required').require();
+                }
+                if (RegPath.trustedFormRequired) {
+                    if (!RegPath.trustedFormFinished) {
+                        RegPath.loadTrustedForm();
+                        while (!RegPath.trustedFormFinished) {
+                            for (var d = 0; d < 125; d++) {
+                                // 125 ms delay
+                            }
+                            RegPath.waitForTrustedFormScreenShot();
+
+                        }
+                    }
+
+                }
+                for (var i = 0; i < RegPath.submitValidation.length; i++) {
+                    var currentField = RegPath.submitValidation[i];
+                    switch (currentField) {
+                        case "email":
+                            RegPath.validateEmailField();
+                            if (!RegPath.isConfirmCheck == true) { RegPath.reCAPTCHACheck = false; }
+                            break;
+                        case "dob":
+                            if ($('#hdn_dob')) // if there are dob field, concatenate them into a hidden field for date validation
+                                $('#hdn_dob').val($('#ddl_dob_month').val() + "/" + $('#ddl_dob_day').val() + '/' + $('#ddl_dob_year').val());
+                            RegPath.validateDobField();
+                            break;
+                        case "dob_single_input":
+                            if ($('#hdn_dob')) //
+                                $('#hdn_dob').val($('#txt_dob').val());
+                            RegPath.validateDobField();
+                            break;
+                        case "first_name":
+                        case "last_name":
+                            $('#txt_' + currentField).require().match(RegPath.nameFieldPattern, RegPath.nameFieldError);
+                            break;
+                        case "zip":
+                            $('#txt_zip').require().match('zip');
+                            break;
+                        case "phone":
+                            $('#txt_phone').require().match(RegPath.fullPhoneFieldPattern, RegPath.fullPhoneFieldError);
+                            break;
+                        default:
+                            if ($(currentField).prop('type') == 'radio') {
+                                var currentRadioName = $(currentField).prop('name');
+                                var hasSelected = $('input[name="' + currentRadioName + '"]:checked').length > 0;
+                                var questionTitle = $(currentField).prop('title');
+                                $(currentField).assert(hasSelected, questionTitle);
+                            }
+                            else
+                                $(currentField).require();
+                            break;
+                    }
+                }
+                RegPath.isFormSubmit = true;
+            });
+
+
+        }
+        this.isSubmitValidationSet = true;
+
+    },
+
+    postValidationPopOver: function () {
+        if (BrowserDetect.browser == 'Safari')
+            window.open(this.submitPopOverUrl, 'nextoffer', 'scrollbars=yes, resizable=yes,toolbar=yes,directories=no,location=no,menubar=no,status=no,left=0,top=0');
+        else
+            window.open(this.submitPopOverUrl, '_blank');
+    },
+
+    postValidationFunction: function (functionString) {
+        $.validity.outputs.metaValidation.resultsValidFunctions.push(functionString);
+    },
+
+    validateEmailSubmit: function (popOverUrl) {
+        this.submitValidation.push("email");
+        if (popOverUrl)
+            this.submitPopOverUrl = popOverUrl;
+        this.validateFormSubmit();
+    },
+
+    validateDobSubmit: function (popOverUrl) {
+        this.submitValidation.push("dob");
+        if (popOverUrl)
+            this.submitPopOverUrl = popOverUrl;
+        this.validateFormSubmit();
+    },
+
+    validateConfirmSubmit: function (popOverUrl) {
+        this.loadTrustedForm();
+        RegPath.isConfirmCheck = true;
+        this.submitValidation = ["dob", "email", "first_name", "last_name", "phone", "zip"];
+        if (popOverUrl)
+            this.submitPopOverUrl = popOverUrl;
+        this.validateFormSubmit();
+    },
+
+    forceLinkoutNewWindow: false,
+    nextOfferUrl: "",
+
+    linkoutWindowRequested: false,
+
+    initNextOffer: function (forceNewWindow, offerSequenceId) {
+        RegPath.SkipOverLayEvent();
+
+        if (typeof forceNewWindow != 'undefined' && forceNewWindow != null)
+            this.forceLinkoutNewWindow = forceNewWindow;
+        else
+            this.forceLinkoutNewWindow = false;
+
+        if (typeof offerSequenceId != 'undefined' && offerSequenceId > 0) {
+            this.nextOfferUrl = '/api/offer?osid=' + offerSequenceId;
+        }
+
+        $("a.nextoffer, a.question-answer, a.question-answer-linkout, a.banner-linkout").unbind('click').click(function (e) {
+            var clickedClass = 'nextOfferClicked';
+
+            if ($(this).hasClass(clickedClass) == false) {
+                // flag ALL answers as clicked
+                $("a.nextoffer, a.question-answer, a.question-answer-linkout, a.banner-linkout").addClass(clickedClass);
+                var isLinkoutOffer = $(this).hasClass('nextoffer') || $(this).hasClass('question-answer-linkout') || $(this).hasClass('banner-linkout');
+                
+                RegPath.showSubmitOverlay();
+
+                if (RegPath.nextOfferUrl.length > 0) {
+
+                    // append answer if there is one
+                    if (!$(this).hasClass("banner-linkout")) {
+                        var submittedAnswer = $(this).text();
+                        var reTextAnswer = /[A-Z0-9]/gi;
+                        if (reTextAnswer.test(submittedAnswer))
+                            RegPath.nextOfferUrl += '&a=' + encodeURI($(this).text());
+                    }
+
+                    
+                    var redirectInterval = setInterval(function () {
+                        // if it's not a linkout offer, or the linkout window action has been
+                        // requested, then we can progress to next offer
+                        if (!isLinkoutOffer || RegPath.linkoutWindowRequested) {
+                            window.location = RegPath.nextOfferUrl;
+                            clearInterval(redirectInterval);
+                        }
+                    }, 125);
+                }
+
+                if (isLinkoutOffer) {
+                    if (BrowserDetect.browser == 'Safari' || RegPath.forceLinkoutNewWindow) {
+                        var uniqueBase = new Date();
+                        var uniqueWindowName = 'nextoffer_' + uniqueBase.getTime();
+                        RegPath.linkoutWindowRequested = true;
+                        var nextoffer = window.open(this.href, uniqueWindowName, 'scrollbars=yes, resizable=yes,toolbar=yes,directories=no,location=no,menubar=no,status=no,left=0,top=0');
+                        if (nextoffer != null)
+                            nextoffer.focus();
+                        return false;
+                    }
+                    else {
+                        RegPath.linkoutWindowRequested = true;
+                    }
+                }
+
+            }
+            else {
+                e.preventDefault();
+                console.debug('Blocked additional click to :' + RegPath.nextOfferUrl);
+            }
+        });
+    },
+
+    showNextOffer: function (offerSequenceId, answerText) {
+        var urlParams = [];
+        if (offerSequenceId)
+            urlParams.push("osid=" + offerSequenceId);
+        if (answerText)
+            urlParams.push("a=" + encodeURI(answerText));
+
+        window.location = '/api/offer' + (urlParams.length > 0 ? "?" + urlParams.join("&") : "");
+    }
+};

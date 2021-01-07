@@ -1,0 +1,295 @@
+@import url("https://fonts.googleapis.com/css?family=Poppins:400,400i,600,600i&display=swap");
+body {
+  font: normal 20px/1.6 'Poppins', sans-serif;
+  letter-spacing: -0.5px;
+  color: #1566a8;
+  background: #1566a8; }
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+::placeholder {
+  color: #4485b9;
+  opacity: 1;
+  /* Firefox */ }
+
+h1 {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 50px;
+  font-weight: 600;
+  line-height: 1;
+  color: #707070; }
+  h1 span {
+    display: block;
+    font-size: 90px;
+    color: #1566a8; }
+
+h2 {
+  margin-bottom: 20px;
+  color: #ed1c24;
+  font-size: 36px;
+  font-weight: 600; }
+
+h3 {
+  margin-bottom: 20px;
+  font-size: 30px;
+  font-weight: 600;
+  font-style: italic; }
+
+p {
+  margin: 0 0 20px; }
+
+label {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700; }
+
+form img {
+  display: none; }
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select {
+  display: block;
+  margin: 0 auto 10px;
+  width: 100%;
+  padding: 1px 10px;
+  border-radius: 7px;
+  border: 2px solid #1566a8;
+  color: #1566a8;
+  font-size: 18px; }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  select:focus {
+    border-color: #1b82d5;
+    outline: none; }
+
+hr {
+  margin: 10px 0 20px; }
+
+select {
+  height: 34px; }
+
+button {
+  display: block;
+  margin: 0 auto 10px;
+  padding: 0 30px;
+  font-size: 22px;
+  background: #1566a8;
+  color: #fff;
+  border-radius: 7px;
+  border: none;
+  text-transform: uppercase; }
+  button:hover {
+    background: #1b82d5; }
+  button.disabled {
+    cursor: not-allowed;
+    background: #a4c5df; }
+    button.disabled:hover {
+      background: #a4c5df; }
+
+header {
+  padding: 10px 0;
+  font-size: 20px;
+  background: #fff;
+  border-bottom: 5px solid #1566a8; }
+  header p {
+    margin: 0; }
+    header p span {
+      color: #ed1c24;
+      font-weight: 600;
+      font-style: italic; }
+
+section {
+  padding: 40px 0;
+  background: #fff; }
+  section#s1 .row > div:first-of-type {
+    position: relative;
+    z-index: 10; }
+  section#s1 img {
+    margin: -40px 0 -40px -220px; }
+  section#s2 img {
+    width: 100%; }
+  section#s2 p:last-of-type {
+    margin-bottom: 0; }
+  section#bar {
+    padding: 15px 0;
+    background: #1566a8;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 24px; }
+    section#bar p {
+      margin: 0; }
+  section#s2 {
+    border-bottom: 5px solid #1566a8; }
+  section form button {
+    margin-top: 20px; }
+  section #note {
+    margin: 0;
+    font-size: 14px; }
+    section #note input {
+      margin-right: 5px;
+      transform: translateY(-2px); }
+  section #optForm1, section #optForm2 {
+    display: none; }
+  section #HBBDiv, section #businessOppText {
+    display: none; }
+  section #prev-opp label {
+    font-weight: 400;
+    font-size: 18px; }
+  section #biz-opps {
+    margin-top: 5px; }
+    section #biz-opps label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 1;
+      cursor: pointer; }
+    section #biz-opps input {
+      margin-right: 5px;
+      margin-bottom: 10px;
+      transform: translateY(1px); }
+
+.bx-wrapper {
+  margin: 0;
+  background: none;
+  box-shadow: none;
+  border: none; }
+
+#loadingGraphic {
+  float: right;
+  display: none;
+  margin: -3px 0;
+  padding: 2px 0 3px; }
+
+#loader {
+  width: 44px;
+  height: 44px;
+  margin: 6px auto;
+  -webkit-animation: 1s ease-in-out infinite animball_two;
+  animation: 1s ease-in-out infinite animball_two; }
+  #loader .loaderBall {
+    width: 44px;
+    height: 44px;
+    position: absolute; }
+    #loader .loaderBall .ball {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      -webkit-animation: 1s ease-in-out infinite animball_one;
+      animation: 1s ease-in-out infinite animball_one; }
+      #loader .loaderBall .ball.ball1 {
+        background-color: #1566a8;
+        top: 0;
+        left: 0; }
+      #loader .loaderBall .ball.ball2 {
+        background-color: #1566a8;
+        top: 0;
+        left: 24px; }
+      #loader .loaderBall .ball.ball3 {
+        background-color: #1566a8;
+        top: 24px;
+        left: 0; }
+      #loader .loaderBall .ball.ball4 {
+        background-color: #1566a8;
+        top: 24px;
+        left: 24px; }
+
+@-webkit-keyframes animball_one {
+  0% {
+    position: absolute; }
+  50% {
+    top: 12px;
+    left: 12px;
+    position: absolute;
+    opacity: 0.5; }
+  100% {
+    position: absolute; } }
+
+@keyframes animball_one {
+  0% {
+    position: absolute; }
+  50% {
+    top: 12px;
+    left: 12px;
+    position: absolute;
+    opacity: 0.5; }
+  100% {
+    position: absolute; } }
+
+@-webkit-keyframes animball_two {
+  0% {
+    -webkit-transform: rotate(0deg) scale(1); }
+  50% {
+    -webkit-transform: rotate(360deg) scale(1.3); }
+  100% {
+    -webkit-transform: rotate(720deg) scale(1); } }
+
+@keyframes animball_two {
+  0% {
+    transform: rotate(0deg) scale(1); }
+  50% {
+    transform: rotate(360deg) scale(1.3); }
+  100% {
+    transform: rotate(720deg) scale(1); } }
+
+@media (max-width: 1199px) {
+  body {
+    font-size: 18px; }
+  h3 {
+    font-size: 28px; }
+  section#s1 img {
+    margin-left: -280px; }
+  section#bar {
+    font-size: 20px; } }
+
+@media (max-width: 991px) {
+  h1 {
+    font-size: 40px; }
+    h1 span {
+      font-size: 60px; }
+  section#s1 img {
+    margin-left: -370px; }
+  section#bar {
+    font-size: 24px;
+    line-height: 1.4; }
+  section#s2 img {
+    float: right;
+    width: 50%;
+    margin-left: 15px; } }
+
+@media (max-width: 767px) {
+  h1 {
+    text-align: center;
+    font-size: 34px; }
+    h1 span {
+      font-size: 48px; }
+  h2 {
+    text-align: center;
+    font-size: 28px; }
+  h3 {
+    font-size: 24px; }
+  label {
+    font-size: 16px; }
+  header {
+    font-size: 22px; }
+    header p {
+      line-height: 1.4;
+      text-align: center; }
+  section#s1 img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 20px 0 -40px -20px; }
+  section#bar {
+    font-size: 20px; }
+  section#s2 img {
+    float: none;
+    width: 100%;
+    margin: 0 0 20px; } }

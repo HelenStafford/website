@@ -1,0 +1,51 @@
+//VITAMIN ANGELS CODE INSERTION
+if (!/(u0-|d0-|u1-|d1-|u2-|d2-|u3-|d3-|u4-|d4-)/.test(window.location.href)){
+    $('.purchase-boxes:first .pricing-boxes').after('<div class="vitamin-angels-container"><div class="uk-flex uk-flex-middle uk-flex-wrap"><div class="uk-flex uk-flex-middle uk-visible-small"><div class="uk-width-1-4 vitamin-angels-logo"><img src="//d39ldsmboekjvi.cloudfront.net/images/logo_vitamin_angels.png" class="uk-width-1-1" /></div><div class=""><h4 class="uk-text-bold uk-text-left">Your Purchase Helps<br> Two Children in Need</h4></div></div><div class="vitamin-angels-image"><img src="//d39ldsmboekjvi.cloudfront.net/images/vitamin-angels-vsl-lfsl.jpg" class="uk-width-1-1" /></div><div class="uk-width-medium-2-3 vitamin-angels-blurb"><h3 class="uk-hidden-small uk-text-left">Your Purchase Helps <span>Two Children</span> in Need</h3><p class="uk-text-left">Zenith Labs<span style="font-size:14px;top:-2px;position:relative;">&#174;</span> now partners with Vitamin Angels.</p><p class="uk-text-left">Vitamin Angels has helped over 70,000,000 children with vitamin deficiencies. They’re rated in the top 4% of charities for trust and efficiency.</p><p class="uk-text-left">Your Zenith Labs<span style="font-size:14px;top:-2px;position:relative;">&#174;</span> purchase funds vitamin A supplementation for two children. Your generosity helps them avoid illness and grow stronger.</p></div><div class="vitamin-angels-logo-desktop"></div></div></div>');
+    }
+// GEO LOCATION
+$( document ).ready(function() {
+    //Cookie Acceptance Message
+    function cookieBot() {
+        $('#CybotCookiebotDialog').html('<div id="CybotCookiebotDialog" name="CybotCookiebotDialog" role="dialog" aria-describedby="CybotCookiebotDialogBodyContentTitle" lang="en" dir="ltr" ng-non-bindable="" style=""><div id="CybotCookiebotDialogBody"><div id="CybotCookiebotDialogBodyContent" style="padding-left: 8px;"><h2 id="CybotCookiebotDialogBodyContentTitle" lang="en">This website uses cookies</h2><div id="CybotCookiebotDialogBodyContentText" lang="en">We use cookies to personalise content and ads, to provide social media features and to analyse our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information that you’ve provided to them or that they’ve collected from your use of their services. </div><div id="CybotCookiebotDialogBodyButtons" style=""><a id="CybotCookiebotDialogBodyButtonAccept" class="CybotCookiebotDialogBodyButton" href="javascript: void(0);" tabindex="0" lang="en" style="margin-left: 2px; padding-left: 12px; padding-right: 12px;"> Accept </a></div></div></div></div>').fadeIn();
+        $('#CybotCookiebotDialogBodyButtonAccept').click( function() {
+            $('#CybotCookiebotDialog').fadeOut();                                                 
+        });
+    }
+    //JSON Call
+    var endpoint = 'https://pro.ip-api.com/json/?fields=status,message,countryCode,regionName&key=5vWn1Ta5eS1fVrD';
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            if(response.countryCode !== "US") {
+                $('.USAcustomers').addClass('uk-hidden');
+                $('.INTcustomers').removeClass('uk-hidden');
+                if($('.shipping').length) {
+                    $('.shipping:not(.shipping_free)').addClass('shipping_int').removeClass('font-bold');
+                }
+                $('#coronavirus_notice').replaceWith('<section uk-scrollspy="cls:uk-animation-slide-down;delay:1000" class="uk-background-muted"><div class="uk-container uk-container-xsmall uk-margin-remove-bottom" uk-alert><a class="uk-alert-close" uk-close></a><h4 class="uk-margin-small-bottom">COVID-19 Notice:</h4><p style="font-size:16px;margin-top:0">Due to COVID-19 we are experiencing shipment delays on <strong class="uk-text-bold">some International orders</strong>. Orders placed <u>outside of the U.S. only</u>, may take up to 4-6 weeks to arrive. We are so sorry for the inconvenience and we are doing everything we can to rush these orders.</p></div></section>');
+                
+                $('#shippingInformationTY').replaceWith('<div id="shippingInformationTY" class="uk-card-body uk-card-small uk-card uk-background-default uk-card-default"><h3 class="text-blue uk-text-center">Shipping Information</h3><hr><p class="uk-alert uk-text-justify uk-box-shadow-medium"><span class="uk-label uk-label-success">Domestic Orders</span><br>Your Supplement order is being shipped out today and it will arrive within the next 7-10 business days for orders within the United States.</p><p class="uk-alert uk-text-justify uk-alert-danger uk-box-shadow-medium"><span class="uk-label uk-label-danger">International Orders</span><br>Due to COVID-19 we are experiencing shipment delays on some International orders. Orders placed outside of the U.S. may take up to 4-6 weeks to arrive. We are so sorry for the inconvenience and we are doing everything we can to rush these orders.</p><hr><p class="uk-text-center"><em>Your items will arrive in a discreet white bubble mailer or box.</em></p></div>');
+            }
+            if(response.regionName == "California") {
+                setTimeout(cookieBot, 5000);
+            }
+        }
+    };
+    xhr.open('GET', endpoint, true);
+    xhr.send();
+});
+$( document ).ready(function() {
+//TELEPHONE NUMBER ON MAIN VSL
+if (!/(u0-|d0-|u1-|d1-|u2-|d2-|u3-|d3-|u4-|d4-|lfsl|exit)/.test(window.location.href)){
+    $('#telefonaso').replaceWith('<section class="telefonaso telefonaso-vsl" style="display:none;"><div class="tc-max-width uk-container"><div class="tc-flex"><div><div class="tc-logo"><img src="//d39ldsmboekjvi.cloudfront.net/images/logo_zenithlabs_white.png" class="uk-width-1-1"></div></div><div class="tc-info"><div><p class="tc-info-cs">Customer Service:</p><p class="tc-info-phone"><span>1-480-378-3498</span></p></div><img src="//d39ldsmboekjvi.cloudfront.net/images/customer_service_header.png" class="tc-info-img"></div></div></div></section>');
+}
+//TELEPHONE NUMBER ON EXIT
+if (/(exit)/.test(window.location.href)){
+    $('#telefonaso').replaceWith('<section class="telefonaso"><div class="tc-max-width uk-container"><div class="tc-flex"><div><div class="tc-logo"><img src="//d39ldsmboekjvi.cloudfront.net/images/logo_zenithlabs_white.png" class="uk-width-1-1"></div></div><div class="tc-info"><div><p class="tc-info-cs">Customer Service:</p><p class="tc-info-phone"><span>1-480-378-3498</span></p></div><img src="//d39ldsmboekjvi.cloudfront.net/images/customer_service_header.png" class="tc-info-img"></div></div></div></section>');
+    }
+//TELEPHONE NUMBER ON UPSELLS
+if (/(u0-|d0-|u1-|d1-|u2-|d2-|u3-|d3-|u4-|d4-)/.test(window.location.href)){
+    $('#telefonaso').replaceWith('<section class="telefonaso"><div class="tc-max-width uk-container"><div class="tc-flex"><div><div class="tc-logo"><img src="//d39ldsmboekjvi.cloudfront.net/images/logo_zenithlabs_white.png" class="uk-width-1-1"></div></div><div class="tc-info"><div><p class="tc-info-cs">Customer Service:</p><p class="tc-info-phone"><span>1-888-217-8135</span></p></div><img src="//d39ldsmboekjvi.cloudfront.net/images/customer_service_header.png" class="tc-info-img"></div></div></div></section>');
+}
+});

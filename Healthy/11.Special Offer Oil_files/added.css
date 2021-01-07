@@ -1,0 +1,51 @@
+.header-text {
+    font-size: 19.2686px;
+    font-weight: 500;   
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.btn {
+    font-size: 17.5439px !important;
+
+}
+.first_section {
+    background: none;
+}
+
+.header-btn {
+	text-decoration: none !important;
+	color: #fff !important;    
+}
+
+a:hover {
+	opacity: 0.8;
+}
+.star-img {
+	height: 18px;
+	width: auto;
+}
+.trustpilot-img {
+	width:80px; 
+	height:auto;
+}
+.logo-img {
+	height:50px; width:auto;
+}
+@media screen and (max-width: 767px) {
+	.star-img {
+		width: 78px;
+		height: auto;
+	}
+	.trustpilot-img {
+		width:76px;
+		height: auto;
+	}
+	.logo-img {
+		width: 67px;
+		height: auto;
+	}
+	.header-text {
+		margin-left: 3px;
+		margin-right: 3px;
+	}
+}

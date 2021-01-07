@@ -1,0 +1,60 @@
+//icashloans.com
+
+
+function createPixel(src){
+  var input = document.createElement('img');
+  input.setAttribute('src',src);
+  input.setAttribute('width', 1);
+  input.setAttribute('height', 1);
+  document.body.appendChild(input); 
+}
+
+//if(!!~document.cookie.indexOf("cybbatest")){
+try{var shopUrlCYB="icashloans.com";!function(){var e=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=e;var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)},t=~document.cookie.indexOf("cybbatest")?"files":"files1";e("//d2rp1k1dldbai6.cloudfront.net/cybba_latest.min.js"),e("https://"+t+".cybba.solutions/"+shopUrlCYB+"/loader.min.js"),window._vteq=window._vteq||[],setTimeout(function(){window._vtsdk||e("https://storage.googleapis.com/cybcdn/"+shopUrlCYB+"/loader.js?")},1100),setTimeout(function(){"nestedVarDefined"in window&&!nestedVarDefined("_vtsdk.state.eventQueue")&&"_vtsdk"in window&&_vtsdk.init()},3e3)}()}catch(e){}	
+//}
+
+
+
+try{
+//apn ads - all accounts
+var confirmInt = setInterval(function(){
+	if($(".last-step .b2c-row.b2c-form-action .b2c-confirmation .b2c-btn").length > 0){
+			clearInterval(confirmInt);
+           var el = $(".last-step .b2c-row.b2c-form-action .b2c-confirmation .b2c-btn")[0];
+           if (el.addEventListener) {
+                el.addEventListener('mousedown', function(){
+                	createPixel("//secure.adnxs.com/px?id=918989&seg=10522822&order_id="+Date.now()+"&value=1&other=[USD]&t=2");
+					window.cybOrderData = {
+        				order_id: Date.now(),
+        				value: 1,
+custom_fields: {
+    currency: "",
+    email: document.cookie.replace(/(?:(?:^|.*;\s*)c_64ei\s*\=\s*([^;]*).*$)|^.*$/, "$1"),
+    sessionid: document.cookie.replace(/(?:(?:^|.*;\s*)cybSessionID\s*\=\s*([^;]*).*$)|^.*$/, "$1")
+}
+					};
+					
+					
+				}, false);
+           } else if (el.attachEvent)  {
+                el.attachEvent('onmousedown', function(){
+                	createPixel("//secure.adnxs.com/px?id=918989&seg=10522822&order_id="+Date.now()+"&value=1&other=[USD]&t=2");
+					window.cybOrderData = {
+        				order_id: Date.now(),
+        				value: 1
+					};
+					
+					
+				});
+           }
+	}
+},1000);
+}catch(e){}
+
+if(!!~window.location.href.indexOf('html')){
+    createPixel("//secure.adnxs.com/seg?add=10522819&t=2"); //APN Prod Pixel. Replace XXXXXX
+}
+createPixel("//secure.adnxs.com/seg?add=10522817&t=2"); //APN ROS Pixel. Replace XXXXXX
+
+
+

@@ -1,0 +1,217 @@
+/*
+ * This is a helper script for pushing data into the
+ * data layer that the Maxymiser site script exposes.
+ */
+(function(win, doc) {
+	var Maxymiser = function() {
+		// local representation of the data layer
+		this.data = {
+			attrs: {},
+			persistentAttrs: {}
+		}
+		// flag for checking if the event listener is ready
+		this.isReady = false
+		// queue of updates that should be pushed when the event listener is ready
+		this.updateQueue = {
+			attrKeys: [],
+			persistentAttrKeys: []
+		}
+
+		// when the Maxymiser event listener is ready,
+		// set isReady = true and push any queued attrs
+		this.handleEvent = function(event) {
+			if (event.type == "maxymiser-ready") {
+				this.isReady = true
+				this.pushUpdateQueue()
+				doc.removeEventListener("maxymiser-ready", this, false)
+			}
+		}
+		doc.addEventListener("maxymiser-ready", this, false)
+	}
+
+	Maxymiser.prototype.pushDataLayerUpdate = function(attrs, persistentAttrs) {
+		if (attrs && this.isReady) {
+			if (win.site && win.site.scope) {
+				var scope = win.site.scope
+				if (scope.onDataLayerUpdate) {
+					// call onDataLayerUpdate so Maxymiser can handle the data layer changes
+					if (scope.onDataLayerUpdate) {
+						scope.onDataLayerUpdate.call(null, {
+							attrs: attrs,
+							persistentAttrs: persistentAttrs
+						})
+					}
+				}
+			}
+		}
+	}
+
+	Maxymiser.prototype.pushUpdateQueue = function() {
+		if (this.updateQueue.attrKeys.length > 0 ||
+				this.updateQueue.persistentAttrKeys.length > 0) {
+			if (win.site && win.site.scope) {
+				var scope = win.site.scope
+				if (!scope.dataLayer) scope.dataLayer = {}
+
+				// push attrs to data layer
+				Object.keys(this.data.attrs).forEach(function(key) {
+					scope.dataLayer[key] = this.data.attrs[key]
+				}, this)
+				// push persistent attrs to data layer
+				Object.keys(this.data.persistentAttrs).forEach(function(key) {
+					scope.dataLayer[key] = this.data.persistentAttrs[key]
+				}, this)
+
+				// notify the Maxymiser site script of data layer updates
+				this.pushDataLayerUpdate(
+					this.updateQueue.attrKeys,
+					this.updateQueue.persistentAttrKeys
+				)
+			}
+		}
+	}
+
+	Maxymiser.prototype.pushAttrs = function(attrs, persistentAttrs) {
+		if (attrs || persistentAttrs) {
+			var attrKeys = attrs ? Object.keys(attrs) : []
+			attrKeys.forEach(function(key) {
+				this.data.attrs[key] = attrs[key]
+			}, this)
+
+			var persistentKeys = persistentAttrs ? Object.keys(persistentAttrs) : []
+			persistentKeys.forEach(function(key) {
+				this.data.persistentAttrs[key] = persistentAttrs[key]
+			}, this)
+
+			// if Maxymiser is ready try to push the changes
+			if (this.isReady && win.site && win.site.scope) {
+				var scope = win.site.scope
+				if (!scope.dataLayer) scope.dataLayer = {}
+
+				attrKeys.forEach(function(key) {
+					scope.dataLayer[key] = attrs[key]
+				})
+
+				persistentKeys.forEach(function(key) {
+					scope.dataLayer[key] = persistentAttrs[key]
+				})
+
+				this.pushDataLayerUpdate(attrKeys, persistentKeys)
+			}
+			// otherwise queue them to be pushed later
+			else {
+				this.updateQueue.attrKeys = this.updateQueue.attrKeys.concat(attrKeys)
+				this.updateQueue.persistentAttrKeys = this.updateQueue.persistentAttrKeys.concat(persistentKeys)
+			}
+		}
+	}
+
+	Maxymiser.prototype.pushPersistentAttrs = function(attrs) {
+		this.pushAttrs(null, attrs)
+	}
+
+	Maxymiser.prototype.getSessionAttributes = function() {
+		var xhReq = new XMLHttpRequest()
+        xhReq.open('GET', '/gl/view/api/user_sessions.jsp', false)
+        xhReq.send(null)
+        var serverResponse = xhReq.responseText
+        var json = JSON.parse(serverResponse)
+        var agencyUser = 'false'
+        var eServiceUser = 'prospect'
+        
+        if (json) {
+            agencyUser = json.agencyUser.toString()
+            if (json.eserviceUser) eServiceUser = 'customer'
+		}
+		
+		return {
+			agent: agencyUser,
+			visitor_status: eServiceUser
+		}
+	}
+
+	Maxymiser.prototype.ageGroup = function(age) {
+		if (age >=0 && age <=17) {
+			return "0-17"
+		}
+		else if (age >=18 && age <=24) {
+			return "18-24"
+		}
+		else if (age >=25 && age <=34) {
+			return "25-34"
+		}
+		else if (age >=35 && age <=49) {
+			return "35-49"
+		}
+		else if (age >=50 && age <=60) {
+			return "50-60"
+		}
+		else if (age >=61 && age <=70) {
+			return "61-70"
+		}
+		else if (age >=71 && age <=80) {
+			return "71-80"
+		}
+		else if (age >=81) {
+			return "81-"
+		}
+		else {
+			return ""
+		}
+	}
+
+	Maxymiser.prototype.adultGender = function(gender) {
+		if (typeof gender === undefined) return
+
+		gender = gender.toLowerCase()
+		if (gender == "male" || gender == "m") {
+			return "male"
+		}
+		else if (gender == "female" || gender == "f"){
+			return "female"
+		}
+	}
+
+	Maxymiser.prototype.childsGender = function(gender) {
+		if (typeof gender === undefined) return
+
+		gender = gender.toLowerCase()
+		if (gender == "male" || gender == "m") {
+			return "boy"
+		}
+		else if (gender == "female" || gender == "f"){
+			return "girl"
+		}
+	}
+
+	Maxymiser.prototype.tobaccoAnswer = function(answer) {
+		if (typeof answer === undefined) return
+
+		answer = answer.toLowerCase()
+		if (answer == "yes" || answer == "y" || answer == "true" || answer == "t" || answer == "12") {
+			return "true"
+		}
+		else if (answer == "no" || answer == "n" || answer == "false" || answer == "f" || answer == "0") {
+			return "false"
+		}
+	}
+
+	Maxymiser.prototype.paymentMethod = function(method) {
+		if (typeof method === undefined) return
+
+		var method = method.toLowerCase()
+		switch (method) {
+			case 'direct':
+				return 'bill me later'
+			case 'eft':
+				return 'checking'
+			case 'credit':
+				return 'credit'
+			default:
+				return ''
+		}
+	}
+
+	// expose the Maxymiser helper globally
+	win.Maxymiser = new Maxymiser()
+})(window, document)

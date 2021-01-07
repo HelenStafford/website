@@ -1,0 +1,53 @@
+$(document).ready(function() {
+	$('#phone').focus(function(){
+		$('#optForm1').slideDown();
+	});
+
+	$('input[name=zipcode]').focus(function(){
+		$('#optForm2').slideDown();
+	});
+
+	$('#HBBYes').click(function() {
+			$('.bx-viewport').animate({
+				height: '+=50px'
+			});
+			$('#HBBDiv').slideDown();
+		});
+
+		$('#HBBNo').click(function() {
+			$('.bx-viewport').animate({
+				height: '-=50px'
+			});
+			$('#HBBDiv').slideUp();
+		});
+
+		$('#businessOppSelect').change(function() {
+			if ($(this).val() == 'other') {
+				$('.bx-viewport').animate({
+					height: '+=50px'
+				});
+				$('#businessOppText').slideDown();
+			} else {
+				$('.bx-viewport').animate({
+					height: '-=50px'
+				});
+				$('#businessOppText').slideUp();
+			}
+		});
+});
+
+function customValidate() {
+	return ($('#name').val() && $('#email').val());
+}
+
+function submitContact() {
+	if ($('#terms_desktop').is(':checked')) {
+		if (customValidate()) {
+			stepAll('captureForm', 1);
+		} else {
+			alert('Please enter a value for all required fields.');
+		}
+	} else {
+		alert('Please check the box confirming that you have read and agree to the privacy policy');
+	}
+}

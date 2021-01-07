@@ -1,0 +1,118 @@
+
+
+.footer{
+	font-size:12px;
+	padding:0 50px;
+}
+a {
+color: #0033a0;
+text-decoration: underline;
+}
+
+.footer{
+	width:960px;
+	margin:0 auto;
+}
+input[type=text]{
+	width:145px;
+	height:30px;
+	border:1px solid #cccccc;
+	font-size:18px;
+	color: #cccccc;
+	text-align:center;
+	line-height:0;
+	display:inline-block;
+	margin-right: 10px;
+    padding: 0;
+}
+
+.main {
+	margin: 0 auto;
+	width: 945px;
+	text-align:center;
+	font-family: ObjektivMk2_Bold, 'Open Sans', Arial, Helvetica, sans-serif;
+}
+#header {
+	height:90px;
+	width:100%;
+	text-align:center;
+	border-bottom: #0033a0 3px solid;
+	vertical-align:middle;
+}
+#header-contain {
+	height:90px;
+	width:945px;
+	text-align:center;
+	margin: auto;
+	vertical-align:middle;
+	line-height:86px;
+}
+#header-logo {
+	width: 181px;
+	height: 90px;
+	float:left;
+}
+#header-logo img {
+	vertical-align: middle;
+}
+#header-phone {
+	height: 20px;
+	float:right;
+	text-align:right;
+	font-family: ObjektivMk2_Bold, 'Open Sans', Arial, Helvetica, sans-serif;
+	font-size:20px;
+	font-weight:300;
+	color:#4f5151;
+	clear:right;
+}
+#start {
+	width:823px;
+	height:321px;
+	margin: 30px auto;
+	padding: 0px 120px 0 0;
+	background-image:url(/Templates/ion/Launch_Pad_946_v2.0/masters/Ph1_Hi_Vol_July17/allstate-test_hi-vol_images_dennis_07.jpg);
+	background-repeat:no-repeat;
+	border-bottom:#0033a0 4px solid !important;
+}
+#quote {
+	width:320px;
+	height: 240px;
+	float:right;
+	margin: 40px 0;
+	text-align:center;
+	font-family: ObjektivMk2_Bold, 'Open Sans', Arial, Helvetica, sans-serif;
+}
+#zip {
+	width:318px;
+	height: 115px;
+	background-color:#0033a0;
+	margin: 20px 0;
+	border: #0033a0 1px solid;
+}
+#lower {
+	margin: 0 auto;
+	width: 945px;
+	text-align:center;
+	font-family: ObjektivMk2_Regular, 'Open Sans', Arial, Helvetica, sans-serif;
+}
+#lower2 {
+	margin: 0 auto;
+	width: 945px;
+	text-align:center;
+	font-family: ObjektivMk2_Regular, 'Open Sans', Arial, Helvetica, sans-serif;
+	border-top:#0033a0 2px solid;
+}
+#disclaimer {
+	margin: 0 auto; width:870px;
+	text-align:center;
+	font-size: 11px;
+	line-height:13px;
+	color:#333;
+	font-family: ObjektivMk2_Regular, 'Open Sans', Arial, Helvetica, sans-serif;
+}
+.pf_text {
+font-size: 18px;
+width: 145px;
+height:25px;
+text-align:center;
+}

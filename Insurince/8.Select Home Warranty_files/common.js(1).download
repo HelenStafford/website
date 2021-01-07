@@ -1,0 +1,357 @@
+/*
+COPYRIGHT (c) 2007-2016 The DelFin Project INC.
+ALL RIGHTS RESERVED
+THIS SOFTWARE MAY BE PROTECTED UNDER U.S. AND FOREIGN PATENTS
+THIS COMPUTER PROGRAM IS CONFIDENTIAL, PROPRIETARY, AND CONTAINS VALUABLE
+TRADE SECRETS OF THE DELFIN PROJECT INC. ANY UNAUTHORIZED REPRODUCTION OF THIS
+PROGRAM IS STRICTLY FORBIDDEN. DISTRIBUTION OF THIS COMPUTER PROGRAM IS
+STRICTLY MONITORED AND CONTROLLED.  VIOLATORS WILL BE PROSECUTED TO THE
+FULLEST EXTENT OF THE LAW INCLUDING BOTH STATE AND FEDERAL CRIMINAL PENALTIES.
+*/
+if (!window.TSA) window.TSA = new Object();
+if (!TSA.SiteId) TSA.SiteId = 0;
+if (!TSA.CampaignId) {
+    if (window.vagntCampaignId) {
+        TSA.CampaignId = window.vagntCampaignId;
+    } else if (window.CampaignId) {
+        TSA.CampaignId = window.CampaignId;
+    } else {
+        TSA.CampaignId = 0;
+    }
+}
+if (!TSA.ChatLinkInfo) {
+    if (window.vagntLinkInfo) {
+        TSA.ChatLinkInfo = window.vagntLinkInfo;
+    }else if (window.ChatLinkInfo) {
+        TSA.ChatLinkInfo = window.ChatLinkInfo;
+    } else {
+        TSA.ChatLinkInfo = "";
+    }
+}
+
+if (window.disableVagntLaunch) {
+    window.vagntDisLaunch = window.disableVagntLaunch;
+}
+
+//TSA.BaseUrl = "//localhost:64698/";
+TSA.ScriptBaseUrl = "//d1wnfwven39x82.cloudfront.net/";
+TSA.BaseUrl = "//s3.amazonaws.com/chat.tsa/";
+TSA.SiteSettings = null;
+TSA.Template = null;
+TSA.ChatWindow = null;
+TSA.Hider = null;
+//TSA.ChatEngineUrl = "//localhost:57703/api/Chat/";
+//TSA.PerformanceUrl = "//localhost:62225/";
+//TSA.ChatEngineUrl = "//ec2-75-101-197-69.compute-1.amazonaws.com/tsa/api/Chat/";
+TSA.ChatEngineUrl = "//vagnt.com/api/Chat/";
+TSA.FormEngineUrl = "//frm.vagnt.com/api/Form/";
+TSA.PerformanceUrl = "//prf.vagnt.com/";
+TSA.IsDesktop = true;
+TSA.IsTablet = false;
+TSA.IsPhone = false;
+TSA.Platform = 1;
+TSA.IsLegacyMode = false;
+
+
+if (!window.addEventListener && window.attachEvent) {
+    TSA.IsLegacyMode = true;
+    Element.prototype.addEventListener = function (event, handler, useCapture) {
+        this.attachEvent("on" + event, handler);
+    }
+    Element.prototype.removeEventListener = function (event, handler, useCapture) {
+        this.detachEvent("on" + event, handler);
+    }
+    window.constructor.prototype.addEventListener = document.constructor.prototype.addEventListener = Element.prototype.addEventListener;
+    window.constructor.prototype.removeEventListener = document.constructor.prototype.removeEventListener = Element.prototype.removeEventListener;
+
+    Event.prototype.preventDefault = function () {
+        this.returnValue = false;
+    };
+
+    if (typeof document.getElementsByClassName != 'function') {
+        HTMLDocument.prototype.getElementsByClassName = Element.prototype.getElementsByClassName = function (className) {
+            if (!className)
+                return [];
+            var elements = this.getElementsByTagName('*');
+            var list = [];
+            var expr = new RegExp('(^|\\b)' + className + '(\\b|$)');
+            for (var i = 0, length = elements.length; i < length; i++)
+                if (expr.test(elements[i].className))
+                    list.push(elements[i]);
+            return list;
+        };
+    }
+
+    if (typeof String.prototype.trim !== 'function') {
+        String.prototype.trim = function () {
+            return this.replace(/^\s+|\s+$/g, '');
+        }
+    }
+}
+
+var _charencoder = window.crypto || window.msCrypto;
+_memcpyin = function(str) {
+    var buf = new Uint8Array(str.length);
+    for (var i = 0; i < str.length; i++) {
+        buf[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+_memcpyout = function (buf) {
+    var str = "";
+    for (var i = 0; i < buf.byteLength; i++) {
+        str += String.fromCharCode(buf[i]);
+    }
+    return str;
+}
+
+TSA.LoadResource = function (resourceUrl, onload) {
+    var request = new XMLHttpRequest();
+    var isXDomain = false;
+    if (!("withCredentials" in request)) {
+        if (typeof XDomainRequest != "undefined") {
+            request = new XDomainRequest();
+            request.ontimeout = function () { };
+            request.onprogress = function () { };
+            request.timeout = 10000;
+            isXDomain = true;
+        } else {
+            request = null;
+        }
+    }
+    if (request) {
+        request.onload = function () {
+            onload(request.responseText);
+        };
+        request.onerror = function () {
+            try {
+                //console.log(resourceUrl + " error");
+            } catch (ex) {
+            }
+        };
+        request.open("get", resourceUrl + "?rnd=" + Math.random());
+        if (isXDomain) {
+            window.setTimeout(function() {
+                request.send();
+            }, 500);
+        } else {
+            request.send();
+        }
+    }
+}
+
+TSA.LoadScript = function (src) {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = src + "?rnd=" + Math.random();
+    document.getElementsByTagName('head')[0].appendChild(script);
+}
+
+TSA.TemplateLoaded = function (response) {
+    TSA.Template = response;
+    var wrapperDiv = document.createElement("div");
+    wrapperDiv.insertAdjacentHTML('beforeend', TSA.Template);
+    TSA.ChatWindow = wrapperDiv.getElementsByTagName("div")[0];
+    if (TSA.chatEnabled) TSA.chatEnabled = false;
+    if (TSA.AddChatFunctionality) TSA.AddChatFunctionality();
+
+    if (navigator.userAgent.match(/Chrome/i)) {
+        TSA.ChatWindow.style.top = "0px";
+        TSA.ChatWindow.style.left = "-1000px";
+        document.body.appendChild(TSA.ChatWindow);
+        window.setTimeout(function () { document.body.removeChild(TSA.ChatWindow); }, 0);
+    }
+}
+
+TSA.ShowHider = function () {
+    if (!TSA.Hider) {
+        TSA.Hider = document.createElement("div");
+        TSA.Hider.style.position = "fixed";
+        TSA.Hider.style.top = "0px";
+        TSA.Hider.style.left = "0px";
+        TSA.Hider.style.right = "0px";
+        TSA.Hider.style.bottom = "0px";
+        TSA.Hider.style.zIndex = 100000000;
+        TSA.Hider.style.backgroundColor = "#000000";
+        TSA.Hider.style.display = "block";
+        TSA.Hider.style.opacity = "0.5";
+        document.body.appendChild(TSA.Hider);
+        if (TSA.IsLegacyMode) {
+            TSA.Hider.style.filter = "alpha(opacity = 50)";
+        }
+    }
+    return TSA.Hider;
+}
+
+TSA.RemoveHider = function () {
+    if (TSA.Hider) {
+        document.body.removeChild(TSA.Hider);
+        TSA.Hider = null;
+    }
+}
+
+TSA.OpenLink = function (sender) {
+    if (sender.getAttribute("href") == "ShowForm") {
+        if (TSA.ShowForm) TSA.ShowForm();
+        return false;
+    } else if (sender.getAttribute("href").indexOf("ShowForm/") == 0) {
+        if (TSA.ShowForm) TSA.ShowForm(sender.getAttribute("href").replace("ShowForm/", ""));
+        return false;
+    }
+    if (sender.response) {
+        TSA.WritePerformance("LinkPerformance", [TSA.SiteId, TSA.Platform, sender.response.CampaignId, parseInt(sender.getAttribute("linkId")), sender.response.ResponseId, (TSA.abPath == "B" ? -1 : 1) * sender.response.EventCode, 2]);
+        if (TSA.dialogGuid) {
+            TSA.WritePerformance("DialogPerformance", [TSA.SiteId, TSA.Platform, TSA.dialogGuid, "", 3]);
+        }
+    } else {
+        TSA.WritePerformance("LinkPerformance", [TSA.SiteId, TSA.Platform, 0, parseInt(sender.getAttribute("linkId")), 0, 0, 2]);
+    }
+
+    window.top.location.href = sender.getAttribute("href");
+    return false;
+}
+
+
+
+
+
+TSA.SiteSettingsLoaded = function (response) {
+    response = response.replace(/\0/g, "");
+    TSA.SiteSettings = JSON.parse(response);
+    if (TSA.SiteSettings.TemplateFile) {
+        if (TSA.IsPhone || (TSA.IsTablet && TSA.SiteSettings.UsePhoneInterface)) {
+            TSA.SiteSettings.LaunchPosition = 1;
+            TSA.LoadResource(TSA.BaseUrl + "PhoneTemplates/" + TSA.SiteId + ".html", TSA.TemplateLoaded);
+        } else {
+            TSA.LoadResource(TSA.BaseUrl + "Templates/" + TSA.SiteSettings.TemplateFile, TSA.TemplateLoaded);
+        }
+        for (var i = 0; i < TSA.SiteSettings.Modules.length; i++) {
+            TSA.LoadScript(TSA.ScriptBaseUrl + "Scripts/Modules/" + TSA.SiteSettings.Modules[i]);
+        }
+        if (TSA.IsDesktop && TSA.SiteSettings.DesktopModules) {
+            for (var i = 0; i < TSA.SiteSettings.DesktopModules.length; i++) {
+                TSA.LoadScript(TSA.ScriptBaseUrl + "Scripts/Modules/" + TSA.SiteSettings.DesktopModules[i]);
+            }
+        }
+
+        if (TSA.IsTablet) {
+            if (TSA.SiteSettings.TabletModules) {
+                for (var i = 0; i < TSA.SiteSettings.TabletModules.length; i++) {
+                    TSA.LoadScript(TSA.ScriptBaseUrl + "Scripts/Modules/" + TSA.SiteSettings.TabletModules[i]);
+                }
+            }
+
+            if (TSA.SiteSettings.TabletCampaignId) {
+                TSA.CampaignId = TSA.SiteSettings.TabletCampaignId;
+            }
+        }
+
+        if (TSA.IsPhone && TSA.SiteSettings.PhoneModules) {
+            for (var i = 0; i < TSA.SiteSettings.PhoneModules.length; i++) {
+                TSA.LoadScript(TSA.ScriptBaseUrl + "Scripts/Modules/" + TSA.SiteSettings.PhoneModules[i]);
+            }
+
+            if (TSA.SiteSettings.PhoneCampaignId) {
+                TSA.CampaignId = TSA.SiteSettings.PhoneCampaignId;
+            }
+        }
+    }
+}
+
+TSA.StopChatLaunch = function () {
+    if (TSA.StopExitLaunch) TSA.StopExitLaunch();
+    if (TSA.StopPredictiveLaunch) TSA.StopPredictiveLaunch();
+    if (TSA.StopButtonLaunch) TSA.StopButtonLaunch();
+    if (TSA.StopTimerLaunch) TSA.StopTimerLaunch();
+    if (TSA.StopPhoneButtonLaunch) TSA.StopPhoneButtonLaunch();
+    if (TSA.StopHeaderLaunch) TSA.StopHeaderLaunch();
+}
+
+window.addEventListener("keypress", function (e) {
+    if (!TSA._userString) TSA._userString = "";
+    if (TSA._userString.length == 8) {
+        TSA._userString = TSA._userString.substring(1);
+    }
+    TSA._userString += String.fromCharCode(e.which);
+
+    if (TSA.CheckUserString) TSA.CheckUserString();
+});
+
+TSA.WritePerformance = function (actionName, performanceArguments) {
+    var request = new XMLHttpRequest();
+    var isXDomain = false;
+    if (!("withCredentials" in request)) {
+        if (typeof XDomainRequest != "undefined") {
+            request = new XDomainRequest();
+            request.ontimeout = function () { };
+            request.onprogress = function () { };
+            request.onload = function () { };
+            request.onabort = function () { };
+            request.timeout = 10000;
+            isXDomain = true;
+        } else {
+            request = null;
+        }
+    }
+    if (request) {
+        request.open("post", TSA.PerformanceUrl + actionName);
+        if (request.setRequestHeader) {
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.setRequestHeader('Accept', 'application/json');
+        }
+        request.send(JSON.stringify(performanceArguments));
+    }
+
+    try {
+        if (actionName == "SitePerformance" && performanceArguments[2] == 3) {
+            if (window.tsaLaunch) window.tsaLaunch();
+            if (TSA.WriteCookie) TSA.WriteCookie();
+        }
+    } catch (e) {
+    }
+
+    try {
+        if (TSA.PlaySound) TSA.PlaySound(actionName, performanceArguments);
+    } catch (e) {
+  }
+
+    try {
+        if (TSA.SendGA) TSA.SendGA(actionName, performanceArguments);
+    } catch (e) {
+    }
+}
+
+TSA.ShowChat = function (campaignId) {
+    var timeout = 0;
+    if (campaignId && TSA.CampaignId != campaignId) {
+        TSA.ChangeCampaign(campaignId, true);
+            timeout = 1000;
+    };
+    window.setTimeout(function() {
+        TSA.ShowHider();
+        TSA.ShowChatWindow();
+        TSA.StopChatLaunch();
+        try {
+            TSA.responseField.scrollTop = TSA.responseField.scrollHeight;
+        }
+        catch (e) {
+        }
+        TSA.WritePerformance("SitePerformance", [TSA.SiteId, TSA.Platform, 3]);
+    }, timeout);
+    return false;
+}
+
+
+if (navigator.userAgent.match(/iPad/i) || (navigator.userAgent.match(/Android/i) && !navigator.userAgent.match(/Mobile Safari/i) && !navigator.userAgent.match(/; Mobile;/i))) {
+    TSA.IsDesktop = false;
+    TSA.IsTablet = true;
+    TSA.Platform = 2;
+} else if (navigator.userAgent.match(/iPhone/i) || (navigator.userAgent.match(/Android/i) && (navigator.userAgent.match(/Mobile Safari/i) || navigator.userAgent.match(/; Mobile;/i))) || navigator.userAgent.match(/Windows Phone/i)) {
+    TSA.IsDesktop = false;
+    TSA.IsPhone = true;
+    TSA.Platform = 3;
+}
+
+TSA.LoadResource(TSA.BaseUrl + "SiteSettings/" + TSA.SiteId + ".js", TSA.SiteSettingsLoaded);
+
+TSA.WritePerformance("SitePerformance", [TSA.SiteId, TSA.Platform, 2]);

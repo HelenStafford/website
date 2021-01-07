@@ -1,0 +1,98 @@
+jQuery(document).ready(function($){
+
+    //nojs
+    $('body').removeClass('no-js');
+
+    //------------------------------------------------------------------------//
+
+    //fakelink
+    $('a[href="#"]').on('click', function(event) {
+        event.preventDefault();
+    });
+
+    //------------------------------------------------------------------------//
+
+    //drop down menu
+    //$('.menu li').has('ul').addClass('dropdown');
+    //$('.menu li').hover(function(){$('ul',this).slideDown(0);},function(){$('ul',this).slideUp(0);});
+    //doubleTapToGo
+    //$('.menu > li:has(ul)').doubleTapToGo();
+
+    //------------------------------------------------------------------------//
+
+    //placeholder
+    $('input[placeholder], textarea[placeholder]').placeholder();
+
+    //------------------------------------------------------------------------//
+
+    $('.mask-date').mask("99/99/9999",{placeholder:"mm/dd/yyyy"});
+    $('.mask-zip').mask("99999",{placeholder:"zip code"});
+    $('.mask-zip2').mask("99999",{placeholder:"Zip"});
+    $('.mask-ft').mask("9",{placeholder:" "});
+    $('.mask-in').mask("99",{placeholder:" "});
+    $('.mask-lbs').mask("999",{placeholder:" "});
+    $('.mask-phone').mask("(999) 999-9999", {placeholder:"(123) 321-5678"});
+
+    //------------------------------------------------------------------------//
+
+    $('.menu-trigger').on('click', function(event) {
+        event.preventDefault();console.log('clicked');
+        $('header').toggleClass('open');
+    });
+
+    var olCounter = 1;
+    $('.wysiwyg ol li').each(function(index, el) {
+        $(this).prepend('<span class="ol-list-style">'+ olCounter +'.</span>');
+        var arr = $(this).parents('ol').find('li').length;
+        console.log(arr);
+        if (index == arr-1 ) {
+            olCounter = 0;
+        }
+        olCounter++;
+    });
+
+    //------------------------------------------------------------------------//
+
+    $('.accordion-title-toggle').on('click', function(event) {
+        event.preventDefault();
+        $(this).parents('.accordion-block').toggleClass('open');
+    });
+
+    $('.accordion-button').on('click', function(event) {
+        event.preventDefault();
+        $(this).parents('.accordion-block').removeClass('open');
+    });
+
+    //------------------------------------------------------------------------//
+
+    $('.faq-block-title a').on('click', function(event) {
+        event.preventDefault();
+        $(this).parents('.faq-block').toggleClass('open');
+    });
+    $('.faq-less').on('click', function(event) {
+        event.preventDefault();
+        $(this).parents('.faq-block').removeClass('open');
+    });
+
+    //glossary
+    $('.glossary-page').on('click', '.glossary-letter-title', function(event) {
+        event.preventDefault();
+        $(this).parents('.glossary-letter').toggleClass('open');
+        $(this).parents('.glossary-letter').find('.glossary-word.open').removeClass('open');
+    });
+
+    $('.glossary-page').on('click', '.glossary-word-title-link', function(event) {
+        event.preventDefault();
+        $(this).parents('.glossary-word').toggleClass('open');
+    });
+
+    //$('.typeahead').typeahead()
+
+
+});//document ready
+
+jQuery(window).load(function() {
+
+    //load
+
+});//window load
