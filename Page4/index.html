@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Claim your audiobook!</title>
+        <link rel="icon" type="image/ico" href="./assets/images/dummy-favicon.ico" />
+        
+        <link rel="stylesheet" href="./assets/css/style.css">
+        <link rel="stylesheet" href="./assets/vendor/bootstrap-4.5.3-dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./assets/css/newsletterpopup.css">
+        <link rel="stylesheet" href="./assets/css/fliptimer.css">			
+		<link rel="stylesheet" href="./assets/css/ctimer.css">
+		<link rel="stylesheet" href="./assets/css/effect.css">
+		<link rel="stylesheet" href="./assets/css/pulse.css">
+		
+		<!--Effect--><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+        <script src="https://use.fontawesome.com/releases/v5.0.10/js/all.js"></script>
+        <script src="./assets/vendor/jquery-3.4.1.min.js"></script>
+        <script src="./assets/vendor/bootstrap-4.5.3-dist/js/bootstrap.bundle.min.js"></script>
+        
+		
+    </head>
+    <body style="background: #DAA520;">
+
+        <div class="container my-4">
+            <div class="card shadow-lg ">
+                <div class="card-body mb-4">
+                    <div class="row my-0">
+                        <!------------- CONTENT  --------------->
+                        <!------------- TITLE HEADING  --------------->
+                        <div class="col-md-12 mb-4 mx-auto text-center">
+						
+						<!-- c Timer HTML Starts Here-->
+						<div class="items-count" id="progress_bar"></div>    
+    <div id="clock-ticker" class="clearfix">
+        <div class="block"><span class="flip-top" id="numdays">0</span><br><span class="label">Days</span></div>
+        <div class="block"><span class="flip-top" id="numhours">0</span><br><span class="label">Hours</span></div>
+        <div class="block"><span class="flip-top" id="nummins">23</span><br><span class="label">Minutes</span></div>
+        <div class="block"><span class="flip-top" id="numsecs">36</span><br><span class="label">Seconds</span></div>
+    </div>	
+	 <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
+	<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
+	<script  src="./assets/js/ctimer.js"></script>
+						<!-- c Timer HTML Ends Here-->
+						<hr/>
+                            
+                        </div>
+                       <!------------- END TITLE HEADING  ------------>
+        
+                        <!------------- MAIN CONTENT  --------------->
+                        <div class="container">
+                            <div class="row">
+                                
+                                <!------------- IMAGE LEFT  --------------->
+                                <div class="col-md-5 mt-4">
+                                    <img src="./assets/images/example.png" class="img-fluid" alt="Responsive image">
+                                </div>
+                                <!------------- END IMAGE LEFT  ---------->
+								
+                                <!------------- TEXT RIGHT  ----------->
+                               
+							   <div class="col-md-7 mt-4" >
+							   
+                                    <h2 class="h2 text-center text-danger"><b>The Greatest Secret By Rhonda Byrne</b></h2>
+									<p class="h6 text-center" style="padding-left:20px padding-right:20px"> Answer to Our few Question Quiz Down Below & Reveal Your FREE access:</p><br/>
+                                    <!--
+                                    <div class="col-12 ml-2">
+                                        <p>we have member 3 miles away <br> more text here here here <br> check our offer in below for more information</p>
+                                        <p></p>
+                                        <p></p>                               
+                                    </div>
+									-->
+                                    <hr/>
+
+
+                                    <div class="container-question" id="packQ1" >
+                                        <div class="text-center">
+                                            <h4 class="h4"><b>Have you already read The Greatest Secret book By Rhonda Byrne?</b></h4>
+                                            <p>Click one of (Yes/No) the buttom below: </p>
+                                        </div>
+                                        <div class="container">
+                                            <div class="col-10 mb-4 mx-auto cr-pulse" > 
+											 
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest1 effect" onclick="answer('YES',1)">YES</a>
+                                            
+											</div>
+                                            <div class="col-10  mb-4 mx-auto">
+											  
+                                                <a   type="button" class="btn btn-secondary btn-lg btn-block Quest1 effect" onclick="answer('NO',1)">NO</a>
+													
+												           
+											   
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="container-question none" id="packQ2">
+                                        <div class="text-center">
+                                            <h4 class="h4"><b>How many years have you been into the Law of Attraction?</b></h4>
+                                            <p>Click one of the buttom below:</p>
+                                        </div>
+                                        <div>
+										
+                                            <div class="col-10 mb-4 mx-auto" class="pulse">
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest2 effect" onclick="answer('Less than a year',2)">Less than a year</a>
+                                            </div>
+                                            <div class="col-10  mb-4 mx-auto">
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest2 effect" onclick="answer('Between 1 and 5 years',2)">Between 1 and 5 years</a>
+                                                
+                                            </div>
+											<div class="col-10  mb-4 mx-auto">
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest2 effect" onclick="answer('More than 5 years',2)">More than 5 years</a>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="container-question none" id="packQ3">
+                                        <div class="text-center">
+                                            <h4 class="h4"><b>Which part of your life you would like to increase right now?</b></h4>
+                                            <p>Click one of the buttom below:</p>
+                                        </div>
+                                        <div>
+                                            <div class="col-10 mb-4 mx-auto">
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest3 effect" onclick="answer('Wealth',3)">Wealth</a>
+                                            </div>
+                                            <div class="col-10  mb-4 mx-auto">
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest3 effect" onclick="answer('Relationships',3)">Relationships</a>
+                                                
+                                            </div>
+											<div class="col-10  mb-4 mx-auto">
+                                                <a    type="button" class="btn btn-secondary btn-lg btn-block Quest3 effect" onclick="answer('Health',3)">Health</a>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="container-question none" id="processQ">
+                                        <div class="row">
+                                            <div class="col-sm-12 text-center" id="dummyAnswer">
+                                                <h4 class="h4 text-danger">STOP. No more answers required!</h4>
+                                            </div>
+
+                                            <div class="col-sm-12 text-center none" id="dummyDoubleCheck">
+                                                <h4 class="h4 text-danger">Prepering the Last Step....</h4>
+                                            </div>
+                                            <div class="col-sm-12 text-center none" id="dummyCongrat">
+                                                <h4 class="h4 text-danger"><b>CONGRATULATION!</b></h4>
+												<h5 class="h6 "><b>-No more answers required!-</b></h6>
+                                            </div>
+											
+                                            <div class="col-sm-12" >
+                                                <div id="dummyLoader" class=" loader" style="display: block;position: relative;
+                                                left: 0;
+                                                top: 0;margin: 42px auto;font-size: 40px;"></div>
+                                            </div>
+
+
+										<!--List of Text starts Here
+                                            <div class="col-sm-11 ml-auto" style=" margin-top:  2rem;" id="dummyDoubleCheck">
+                                                <p class="none" id="dCheck1"><i class="fas fa-check" data-fa-transform="grow-2"></i>  Found 3 posible answers</p>
+                                                <p class="none" id="dCheck2"><i class="fas fa-check" data-fa-transform="grow-2"></i>  No double registration found</p>
+                                                <p class="none" id="dCheck3"><i class="fas fa-check" data-fa-transform="grow-2"></i>  You can register now for FREE</p>
+                                            </div>
+                                            <div class="col-sm-12 none" id="dummyTerm">
+                                                <ol style=" margin-bottom: 2rem; margin-top:  2rem;">
+                                                    <li>lorem ipsum sit amet,consecuteur adispiscing elit </li>
+                                                    <li>lorem ipsum sit amet,consecuteur adispiscing elit </li>
+                                                    <li>lorem ipsum sit amet,consecuteur adispiscing elit </li>
+                                                </ol>
+										
+                                                <p class="font-xs">
+                                                    This text is a summary for information only. It does not constitute any contractual obligations.
+													For more information, please read our Terms of Use before using the content.</p>
+                                            </div>
+											List of Text Ends Here -->
+                                            <div class="col-sm-12  my-4 mx-auto none" id="btnForAcc">
+											
+											<!--Email submid form stats here -->
+						
+						<label>Thank you for your answers. We’ve already prepared your FREE download link to <b>The Greatest Secret by Rhonda Byrne</b> audiobook. Please enter your primaly Email Address Down Below where you want to get you FREE access to be delivered.</label>
+						
+					<div id="frm_subscribe" style="text-align:center">
+						<form method="POST" name="google-sheet" id="subscribe_popup">
+							<div>
+							<!--
+							<span class="required">*</span><span>Email</span>
+							<input type="text" value="" name="subscribe_pemail" id="subscribe_pemail">
+							<a class="button" onclick="" ><span>Submit</span></a>
+							-->
+							<input type="text" id="container-answer1" value="" name="answer1" hidden>
+							<input type="text" id="container-answer2" name="answer2" hidden>
+							<input type="text" id="container-answer3" name="answer3" hidden>
+							
+							<input style="height: calc(2.5em + 0.75rem + 2px);" name="Email" class="form-control mx-auto" placeholder="Your Email *" id="subscribe_pemail" value="" required=""/>
+							<input type="hidden" value="" name="subscribe_pname" id="subscribe_pname">
+							<div id="notification"></div>
+							 
+							<input type="submit" name="submit" class="button text-white effect" value="Send me my audiobook!"  onclick="" style="background-color:#d9534f; width:100%"/>
+							</div>
+							<p style="font-size: 13px"> After Clicking "SEND ME MY AUDIOBOOK! Submit Button, Please Wait 2-3s When Confirmation page Will Opens. After that we will send to you a Free audiobook to your Email Address you Provided.</p>
+						</form>		
+						
+					</div>
+				</div>
+			</div>
+		</div>
+			<!--Email submit form Ends Here -->
+                                               <!-- I Agree button <a  href="#popup1"  type="button" class="btn btn-success btn-lg btn-block Quest3" style="background-size: 400% 400%; text-transform: uppercase;">I Agree</a> -->
+                                                
+                                            </div>
+        
+                                            
+                                        </div>
+                                        
+                                    </div>
+                            </div>
+                        </div>
+                        <!------------- END MAIN CONTENT  --------------->
+        <hr/> <!--Below Image -->
+		<p class="col-sm-12" style="font-size: 12px; text-align:center"> The Access to Audiobook will appear after finishing a few quistion quiz (if we still have a FREE access avalible). Hurry up to finish this quiz!  </p>
+                        <!------------- END CONTENT  --------------->
+                    </div>
+                </div>
+              </div>
+              
+        </div>
+
+
+
+        <!------------- FIRST POP UP --------------->
+        <div class="modal modal-timer fade bd-example-modal-sm" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+                        
+                        
+
+					
+					<div class="modal-body">
+						<div class="my-4">
+							<!--------------------P1------------------->
+						
+                    <!--Date        <p><b><span id="showCurrenDate"></span></b></p> -->
+                            <h3><b>Note! </h3><td> <img src="assets/images/mini-ebook.png" class="logo-main"></b>
+                            <p>There's a limited downloads availible! A FREE Access to <b> "The Greatest Secret" audiobook by Rhonda Byrne</b> Will Apper After Finishing a Few Question Quiz. Please Note:
+							</p><br><p style="font-style: italic; font-size:14px"> You will have a short amount of time to download this audiobook. If you don't download after 24 hour someone else can take your access. </p><br>
+							<p> Click the OK Button Below to Claim You FREE Access...  </p>
+                         
+                            <!--------------------P1------------------->
+                            
+                           <!---------------FLIP TIMER--------------->
+                            
+							<!--------END FLIP TIMER------->
+
+
+						</div>
+					</div>
+					
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="background-color:#ff9f00">Ok</button>
+                            
+                        </div>
+                    
+				</div>
+			</div>
+        </div>
+      
+        <script>	
+            $('#exampleModal').modal('show');
+        </script>
+         <script src="https://use.fontawesome.com/releases/v5.0.10/js/all.js"></script>
+        <!------------- FIRST POP UP  --------------->
+    </body>
+    <!---<script src="./assets/vendor/jquery-3.4.1.min.js"></script>-->
+   
+    <script src="./assets/js/question.js"></script>
+    <script src="./assets/js/GSheet_new.js"></script>
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/fliptimer.js"></script>
+     
+    
+</html>

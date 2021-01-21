@@ -1,1 +1,0 @@
-$(document).ready(function(){var USA=new Bloodhound({datumTokenizer:Bloodhound.tokenizers.whitespace,queryTokenizer:Bloodhound.tokenizers.whitespace,prefetch:'/js/cities-min.txt'});$('#zip').typeahead({hint:false,highlight:true,minLength:5},{name:'USA',source:USA,limit:100});});

@@ -1,3 +1,0 @@
-var ckm_cp = true;
-var ckm_request_id = 138843769;
-if (typeof CKMLib == 'object') CKMLib.setCookie('ckmsid', 138843769);
